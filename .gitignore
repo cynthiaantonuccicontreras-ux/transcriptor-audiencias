@@ -17,3 +17,7 @@ yarn-error.log*
 *.key
 *.mobileprovision
 dist/
+dist-offline-check/
+
+# Motor y modelos descargados localmente; nunca audios ni modelos en GitHub.
+local-runtime/

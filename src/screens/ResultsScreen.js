@@ -55,6 +55,10 @@ export default function ResultsScreen({ route }) {
           {fileName}
         </Text>
 
+        <Text variant="bodySmall" style={styles.matchCount}>
+          Borrador automático: revisa nombres, cifras y citas contra el audio.
+        </Text>
+
         <Searchbar
           placeholder="Buscar palabra o frase"
           value={query}

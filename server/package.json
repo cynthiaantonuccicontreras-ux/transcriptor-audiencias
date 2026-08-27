@@ -6,14 +6,14 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
-    "check": "node --check src/index.js && node --check src/routes/transcriptions.js && node --check src/services/audioSplitter.js && node --check src/services/whisperService.js"
+    "check": "node --check src/index.js && node --check src/routes/transcriptions.js && node --check src/services/audioSplitter.js && node --check src/services/whisperService.js",
+    "test": "node --test test/*.test.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
-    "multer": "^2.0.2",
-    "openai": "^5.12.2"
+    "multer": "^2.0.2"
   },
   "optionalDependencies": {
     "ffmpeg-static": "^5.2.0"

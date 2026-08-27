@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process';
+import { runLocalProcess } from '../lib/localProcess.js';
 import { createRequire } from 'node:module';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
@@ -8,7 +8,7 @@ const require = createRequire(import.meta.url);
 function resolveFfmpegPath() {
   if (process.env.FFMPEG_PATH) return process.env.FFMPEG_PATH;
   try {
-    return require('ffmpeg-static');
+    return require('ffmpeg-static') || 'ffmpeg';
   } catch {
     // En Termux, ffmpeg se instala con `pkg install ffmpeg` y queda en PATH.
     return 'ffmpeg';
@@ -17,56 +17,35 @@ function resolveFfmpegPath() {
 
 const ffmpegPath = resolveFfmpegPath();
 
-const DEFAULT_CHUNK_DURATION_SECONDS = 10 * 60;
+const DEFAULT_LOCAL_CHUNK_SECONDS = 2 * 60;
 const DEFAULT_MAX_CHUNK_BYTES = 24_000_000;
 
-function runFfmpeg(args) {
-  if (!ffmpegPath) {
-    throw new Error('FFmpeg no está disponible para esta plataforma.');
-  }
-
-  return new Promise((resolve, reject) => {
-    const process = spawn(ffmpegPath, args, {
-      windowsHide: true,
-      stdio: ['ignore', 'ignore', 'pipe'],
-    });
-    let stderr = '';
-
-    process.stderr.on('data', (chunk) => {
-      stderr += chunk.toString();
-    });
-    process.on('error', reject);
-    process.on('close', (code) => {
-      if (code === 0) {
-        resolve();
-        return;
-      }
-      reject(new Error(`FFmpeg terminó con código ${code}: ${stderr.slice(-1200)}`));
-    });
-  });
-}
 
 /**
- * Convierte cualquier audio compatible con FFmpeg a MP3 mono de 48 kbps y lo
- * divide en bloques cronológicos. A 48 kbps, un bloque de diez minutos ocupa
- * aproximadamente 3,6 MB, con margen amplio frente al límite de 25 MB.
+ * Genera WAV PCM mono de 16 kHz para whisper.cpp local. Cada bloque de dos
+ * minutos ocupa unos 3,84 MB. El audio se procesa en disco, no entero en RAM.
  */
 export async function splitAudio(inputPath, outputDirectory) {
   const chunkDuration = Number(
-    process.env.CHUNK_DURATION_SECONDS || DEFAULT_CHUNK_DURATION_SECONDS
+    process.env.LOCAL_CHUNK_SECONDS || DEFAULT_LOCAL_CHUNK_SECONDS
   );
   const maxChunkBytes = Number(
     process.env.MAX_CHUNK_BYTES || DEFAULT_MAX_CHUNK_BYTES
   );
 
-  if (!Number.isFinite(chunkDuration) || chunkDuration < 60) {
-    throw new Error('CHUNK_DURATION_SECONDS debe ser un número de al menos 60.');
+  if (!Number.isFinite(chunkDuration) || !Number.isInteger(chunkDuration) || chunkDuration < 1 || chunkDuration > 600) {
+    throw new Error('LOCAL_CHUNK_SECONDS debe ser un entero entre 1 y 600.');
+  }
+
+  if (!Number.isFinite(maxChunkBytes) || maxChunkBytes < 100_000) {
+    throw new Error('MAX_CHUNK_BYTES debe ser de al menos 100000.');
   }
 
   await fs.mkdir(outputDirectory, { recursive: true });
-  const outputPattern = path.join(outputDirectory, 'part-%05d.mp3');
+  const outputPattern = path.join(outputDirectory, 'part-%05d.wav');
 
-  await runFfmpeg([
+  await runLocalProcess(ffmpegPath, [
+    '-nostdin',
     '-hide_banner',
     '-loglevel',
     'error',
@@ -81,9 +60,7 @@ export async function splitAudio(inputPath, outputDirectory) {
     '-ar',
     '16000',
     '-c:a',
-    'libmp3lame',
-    '-b:a',
-    '48k',
+    'pcm_s16le',
     '-f',
     'segment',
     '-segment_time',
@@ -91,13 +68,13 @@ export async function splitAudio(inputPath, outputDirectory) {
     '-reset_timestamps',
     '1',
     '-segment_format',
-    'mp3',
+    'wav',
     outputPattern,
   ]);
 
   const files = (await fs.readdir(outputDirectory))
-    .filter((name) => /^part-\d{5}\.mp3$/.test(name))
-    .sort()
+    .filter((name) => /^part-\d{5,}\.wav$/.test(name))
+    .sort((a, b) => Number(a.slice(5, -4)) - Number(b.slice(5, -4)))
     .map((name) => path.join(outputDirectory, name));
 
   if (files.length === 0) {
@@ -109,7 +86,7 @@ export async function splitAudio(inputPath, outputDirectory) {
     if (size > maxChunkBytes) {
       throw new Error(
         `El fragmento ${path.basename(file)} pesa ${size} bytes y supera el límite seguro. ` +
-          'Reduce CHUNK_DURATION_SECONDS.'
+          'Reduce LOCAL_CHUNK_SECONDS.'
       );
     }
   }

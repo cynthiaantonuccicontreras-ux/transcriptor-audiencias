@@ -1,69 +1,95 @@
-import { createReadStream } from 'node:fs';
-import OpenAI from 'openai';
+import { constants, promises as fs } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { runLocalProcess } from '../lib/localProcess.js';
 
-const MAX_ATTEMPTS = 4;
-const CONTEXT_CHARACTERS = 700;
+const projectRoot = fileURLToPath(new URL('../../../', import.meta.url));
 
-function getClient() {
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error('Falta OPENAI_API_KEY en server/.env.');
+export function getLocalSettings(env = process.env) {
+  const threads = Number(env.WHISPER_THREADS || 2);
+  const timeoutMs = Number(env.WHISPER_CHUNK_TIMEOUT_MS || 3_600_000);
+  if (!Number.isInteger(threads) || threads < 1 || threads > 8) {
+    throw new Error('WHISPER_THREADS debe ser un entero entre 1 y 8.');
   }
-  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  if (!Number.isFinite(timeoutMs) || timeoutMs < 1000) {
+    throw new Error('WHISPER_CHUNK_TIMEOUT_MS debe ser de al menos 1000.');
+  }
+  return {
+    binary: env.WHISPER_CPP_BIN || path.join(projectRoot, 'local-runtime/whisper.cpp-1.8.2/build/bin/whisper-cli'),
+    model: env.WHISPER_MODEL_PATH || path.join(projectRoot, 'local-runtime/models/ggml-base-q5_1.bin'),
+    language: env.TRANSCRIPTION_LANGUAGE || 'es',
+    threads,
+    timeoutMs,
+  };
 }
 
-function shouldRetry(error) {
-  return error?.status === 429 || (error?.status >= 500 && error?.status <= 599);
+export async function assertLocalEngineAvailable(settings = getLocalSettings()) {
+  try {
+    await fs.access(settings.binary, constants.X_OK);
+    await fs.access(settings.model, constants.R_OK);
+    const stat = await fs.stat(settings.model);
+    if (!stat.isFile() || stat.size === 0) throw new Error('Modelo vacío');
+  } catch {
+    throw new Error('Falta instalar el motor gratuito. En Termux ejecuta: bash scripts/setup-offline-termux.sh');
+  }
 }
 
-const wait = (milliseconds) =>
-  new Promise((resolve) => setTimeout(resolve, milliseconds));
-
-async function transcribeOneChunk(client, filePath, previousContext) {
-  const model = process.env.OPENAI_TRANSCRIPTION_MODEL || 'whisper-1';
-  const language = process.env.TRANSCRIPTION_LANGUAGE || 'es';
-  let lastError;
-
-  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
-    try {
-      const response = await client.audio.transcriptions.create({
-        file: createReadStream(filePath),
-        model,
-        language,
-        response_format: 'json',
-        temperature: 0,
-        prompt: previousContext || undefined,
-      });
-      return String(response.text || '').trim();
-    } catch (error) {
-      lastError = error;
-      if (!shouldRetry(error) || attempt === MAX_ATTEMPTS) throw error;
-      await wait(1000 * 2 ** (attempt - 1));
+// Los mensajes de progreso pueden llegar partidos entre varios eventos.
+export function createProgressParser(onProgress) {
+  let buffer = '';
+  let last = 0;
+  return (text) => {
+    buffer = (buffer + text).slice(-4096);
+    const lines = buffer.split(/[\r\n]/);
+    buffer = lines.pop();
+    for (const line of lines) {
+      const match = line.match(/progress\s*=\s*(\d+)%/);
+      if (!match) continue;
+      const progress = Math.min(100, Math.max(0, Number(match[1])));
+      if (progress > last) {
+        last = progress;
+        onProgress(progress / 100);
+      }
     }
-  }
-
-  throw lastError;
+  };
 }
 
-/**
- * Transcribe secuencialmente para conservar el orden. El final del texto
- * anterior se envía como prompt al siguiente bloque, lo que ayuda a mantener
- * nombres propios y contexto cuando el corte ocurre cerca de una frase.
- */
-export async function transcribeChunks(chunkPaths, onPartStart = () => {}) {
-  const client = getClient();
-  const texts = [];
-  let previousContext = '';
+// Ejecutable real por defecto; inyección para pruebas sin modelo ni API.
+// Nunca hay un fallback a una API, incluso si falla la transcripción local.
+export function createLocalTranscriber({
+  env = process.env,
+  run = runLocalProcess,
+  check = assertLocalEngineAvailable,
+} = {}) {
+  return async (chunkPaths, { onPartStart = () => {}, onPartProgress = () => {} } = {}) => {
+    const settings = getLocalSettings(env);
+    await check(settings);
+    const texts = [];
 
-  for (let index = 0; index < chunkPaths.length; index += 1) {
-    onPartStart(index + 1, chunkPaths.length);
-    const text = await transcribeOneChunk(
-      client,
-      chunkPaths[index],
-      previousContext
-    );
-    if (text) texts.push(text);
-    previousContext = text.slice(-CONTEXT_CHARACTERS);
-  }
+    for (let index = 0; index < chunkPaths.length; index += 1) {
+      const part = index + 1;
+      onPartStart(part, chunkPaths.length);
+      const outputBase = chunkPaths[index] + '.transcription';
+      await run(settings.binary, [
+        '-m', settings.model,
+        '-f', chunkPaths[index],
+        '-l', settings.language,
+        '-t', String(settings.threads),
+        '-ng', '-nt', '-pp',
+        '-bs', '1', '-bo', '1',
+        '-otxt', '-of', outputBase,
+      ], {
+        timeoutMs: settings.timeoutMs,
+        onStderr: createProgressParser((progress) => onPartProgress(part, chunkPaths.length, progress)),
+      });
+      // No presentamos un resultado parcial como completo si falta un archivo.
+      const text = (await fs.readFile(outputBase + '.txt', 'utf8')).trim();
+      texts.push(text);
+      onPartProgress(part, chunkPaths.length, 1);
+    }
 
-  return texts.join('\n\n').trim();
+    return texts.filter(Boolean).join('\n\n');
+  };
 }
+
+export const transcribeChunks = createLocalTranscriber();

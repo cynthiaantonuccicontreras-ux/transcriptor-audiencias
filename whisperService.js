@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const POLL_INTERVAL_MS = 1200;
-const API_URL = (process.env.EXPO_PUBLIC_API_URL || '').replace(/\/$/, '');
+const API_URL = (process.env.EXPO_PUBLIC_API_URL || 'http://127.0.0.1:3000').replace(/\/$/, '');
 
 const wait = (milliseconds) =>
   new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -9,7 +9,7 @@ const wait = (milliseconds) =>
 function assertApiUrl() {
   if (!API_URL || API_URL.includes('TU_IP_LOCAL')) {
     throw new Error(
-      'Falta configurar EXPO_PUBLIC_API_URL con la IP local de tu computador.'
+      'Falta configurar EXPO_PUBLIC_API_URL para el servicio local de Termux.'
     );
   }
 }
@@ -28,8 +28,8 @@ function normalizeAudio(audio) {
 
 /**
  * Sube el audio al microservicio y consulta el avance hasta obtener el texto.
- * La fragmentación y la llamada a OpenAI ocurren en Node.js para que la clave
- * nunca quede dentro de la aplicación móvil.
+ * La fragmentación y whisper.cpp se ejecutan localmente. No hay llamadas
+ * a OpenAI, claves de API ni cobros por transcripción.
  */
 export async function transcribeLongAudio(audio, { onProgress, signal } = {}) {
   assertApiUrl();
@@ -61,7 +61,9 @@ export async function transcribeLongAudio(audio, { onProgress, signal } = {}) {
         });
       },
     }
-  );
+  ).catch((error) => {
+    throw new Error(error.response?.data?.error || 'No responde Termux. Mantén abierto el servicio local e inténtalo de nuevo.');
+  });
 
   const { jobId } = uploadResponse.data;
   if (!jobId) {

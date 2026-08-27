@@ -5,9 +5,13 @@ import multer from 'multer';
 
 import { createJob, getJob, getPublicJob, updateJob } from '../lib/jobs.js';
 import { splitAudio } from '../services/audioSplitter.js';
-import { transcribeChunks } from '../services/whisperService.js';
+import { assertLocalEngineAvailable, transcribeChunks } from '../services/whisperService.js';
+
+import { createSerialQueue } from '../lib/serialQueue.js';
 
 const router = Router();
+const enqueue = createSerialQueue();
+let pendingJobs = 0;
 const uploadsRoot = path.resolve(process.cwd(), 'uploads');
 const maxUploadBytes = Number(process.env.MAX_UPLOAD_BYTES || 2_000_000_000);
 
@@ -52,15 +56,19 @@ async function processJob(jobId, uploadedFilePath) {
       progress: 15,
     });
 
-    const text = await transcribeChunks(chunkPaths, (currentPart, totalParts) => {
-      const progress = 15 + Math.floor(((currentPart - 1) / totalParts) * 80);
+    const reportProgress = (currentPart, totalParts, fraction = 0) => {
+      const progress = 15 + Math.floor(((currentPart - 1 + fraction) / totalParts) * 80);
       updateJob(jobId, {
         status: 'transcribing',
-        message: `Transcribiendo parte ${currentPart} de ${totalParts}...`,
+        message: 'Transcribiendo parte ' + currentPart + ' de ' + totalParts + ' en el teléfono...',
         progress,
         currentPart,
         totalParts,
       });
+    };
+    const text = await transcribeChunks(chunkPaths, {
+      onPartStart: (part, total) => reportProgress(part, total, 0),
+      onPartProgress: reportProgress,
     });
 
     updateJob(jobId, {
@@ -79,6 +87,7 @@ async function processJob(jobId, uploadedFilePath) {
       error: error?.message || 'Error inesperado al procesar el audio.',
     });
   } finally {
+    pendingJobs -= 1;
     await Promise.allSettled([
       removePath(uploadedFilePath),
       removePath(chunksDirectory),
@@ -86,15 +95,38 @@ async function processJob(jobId, uploadedFilePath) {
   }
 }
 
-router.post('/', upload.single('audio'), (request, response) => {
+router.post('/', async (request, response, next) => {
+  if (pendingJobs >= 2) {
+    response.status(429).json({ error: 'Ya hay dos audios pendientes. Espera a que terminen.' });
+    return;
+  }
+  // Reserva antes de recibir el archivo para limitar también cargas simultáneas.
+  pendingJobs += 1;
+  try {
+    await assertLocalEngineAvailable();
+  } catch (error) {
+    pendingJobs -= 1;
+    response.status(503).json({ error: error.message });
+    return;
+  }
+  upload.single('audio')(request, response, (error) => {
+    if (error) {
+      pendingJobs -= 1;
+      next(error);
+      return;
+    }
+    next();
+  });
+}, (request, response) => {
   if (!request.file) {
+    pendingJobs -= 1;
     response.status(400).json({ error: 'Debes adjuntar el campo de audio.' });
     return;
   }
 
   const job = createJob(request.file.originalname);
   response.status(202).json({ jobId: job.id });
-  setImmediate(() => processJob(job.id, request.file.path));
+  void enqueue(() => processJob(job.id, request.file.path));
 });
 
 router.get('/:jobId', (request, response) => {

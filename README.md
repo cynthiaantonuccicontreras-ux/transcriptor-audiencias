@@ -1,306 +1,219 @@
-# Transcriptor de Audiencias
+# Transcriptor de Audiencias — local y sin API de pago
 
-Aplicación móvil para Android construida con React Native y Expo. Permite grabar una audiencia o seleccionar un archivo de audio extenso, mostrar el avance del trabajo y entregar una transcripción completa con buscador y copia al portapapeles.
+Aplicación Android con React Native, Expo y Node.js. Graba o abre audios largos,
+muestra progreso por fragmento y entrega el texto con buscador y copia al portapapeles.
 
-La solución usa dos piezas:
+**Esta versión no usa la API de OpenAI, no requiere una clave, tarjeta ni suscripción
+y no cobra por minuto.** Ejecuta el motor abierto [whisper.cpp](https://github.com/ggml-org/whisper.cpp)
+en el mismo teléfono mediante Termux. Instalar la aplicación y descargar el modelo
+sí requiere internet y puede consumir datos de tu plan.
 
-- **Aplicación Expo:** interfaz, grabación, selección del archivo, progreso y resultados.
-- **Microservicio Node.js:** recibe el audio, lo convierte con FFmpeg a bloques livianos, los transcribe en orden y une el texto final.
+## Qué cambia y qué limitaciones tiene
 
-## Uso solo desde Android con Termux
+- La interfaz sigue siendo React Native/Expo; el motor se ejecuta dentro de Termux.
+  No es todavía un APK independiente: deben permanecer abiertos Termux y Expo Go.
+- Modelo inicial: `base-q5_1` multilingüe (incluye español), unos 57 MiB. Se verifica
+  la descarga usando el SHA publicado por el [distribuidor del modelo](https://huggingface.co/ggerganov/whisper.cpp).
+- No usa servidores de transcripción externos ni tiene un fallback de pago.
+- Un modelo pequeño puede equivocarse más que un modelo grande. Revisa nombres,
+  cifras, fechas y términos jurídicos contra el audio. No es una transcripción certificada.
+- La velocidad depende del teléfono. Un audio de una hora podría tardar más de una
+  hora; no se ha medido todavía en el teléfono de la usuaria. Consume batería y puede
+  calentar el dispositivo. Prueba primero 30 segundos, después 5 minutos.
+- Se necesita espacio para el archivo original, la copia de carga y fragmentos WAV:
+  estos últimos suman aproximadamente 115 MB por hora. Reserva además espacio para
+  paquetes, compilación y modelo; se recomiendan varios GB libres.
+- Los trabajos y resultados permanecen en memoria, hasta 24 horas tras terminar.
+  Cerrar el servidor o un cierre forzado de Android pierde ese estado; no hay
+  reanudación después de reiniciar. Copia el resultado antes de salir.
+- Los archivos temporales de cada trabajo se borran al terminar o fallar. Un cierre
+  brusco puede dejar temporales; no se borran los audios originales del teléfono.
+- La grabación en segundo plano/pantalla bloqueada no está garantizada en Expo Go.
 
-Si no tienes computador, el teléfono puede ejecutar tanto Expo como el servidor local. Usa una versión oficial de Termux instalada desde F-Droid o desde las publicaciones oficiales de GitHub; la antigua versión de Google Play puede ser incompatible.
+## Actualizar una instalación existente desde Android
 
-En Termux, copia y ejecuta esta línea completa:
+Si ya ejecutaste el instalador anterior en `transcriptor-audiencias-app`, pega esto
+en Termux:
 
 ```bash
-pkg update -y && pkg install -y git && git clone https://github.com/cynthiaantonuccicontreras-ux/transcriptor-audiencias.git && cd transcriptor-audiencias && bash scripts/setup-termux.sh
+cd "$HOME/transcriptor-audiencias-app" && git pull --ff-only && bash scripts/setup-offline-termux.sh
 ```
 
-Cuando termine, agrega tu clave de OpenAI:
+No hace falta reinstalar Termux, borrar archivos ni introducir una clave. Si existe
+un antiguo `server/.env` con `OPENAI_API_KEY`, la nueva versión **no la lee para
+transcribir**. No publiques ese archivo; sigue excluido de GitHub.
+
+El instalador prepara las dependencias, compila whisper.cpp v1.8.2 (commit fijado),
+descarga el modelo multilingüe y comprueba su integridad. No cambia permisos de
+seguridad del teléfono. Puede ejecutarse de nuevo si una descarga se interrumpe.
+
+Al terminar debe decir **Instalación gratuita terminada**.
+
+## Instalación nueva, sólo desde Android
+
+1. Instala [Termux desde una fuente oficial](https://github.com/termux/termux-app#installation).
+   Existe una versión oficial en Google Play y otra en F-Droid/GitHub; no mezcles
+   instalaciones ni complementos de distintos orígenes. La variante Google Play
+   tiene diferencias de compatibilidad.
+2. Abre Termux y ejecuta:
 
 ```bash
-nano server/.env
+cd "$HOME"
+pkg update -y && pkg install -y git
+git clone https://github.com/cynthiaantonuccicontreras-ux/transcriptor-audiencias.git transcriptor-audiencias-app
+cd transcriptor-audiencias-app
+bash scripts/setup-termux.sh
 ```
 
-Reemplaza `sk-reemplaza-esta-linea` por la clave real. Guarda con **Ctrl + O**, confirma con **Enter** y sal con **Ctrl + X**.
-
-Para iniciar todo desde el teléfono:
+3. Usa [Expo Go compatible con SDK 54](https://expo.dev/go?sdkVersion=54&platform=android&device=true).
+   El proyecto conserva SDK 54. Actualizar Expo Go a una versión incompatible **no**
+   actualiza este proyecto. La instalación de un APK requiere una confirmación
+   manual de Android; no desactives Play Protect para resolver una advertencia.
+4. Inicia la aplicación:
 
 ```bash
-cd ~/transcriptor-audiencias && bash scripts/start-termux.sh
+cd "$HOME/transcriptor-audiencias-app"
+bash scripts/start-termux.sh
 ```
 
-El script mantiene activo el teléfono, inicia Node/FFmpeg, levanta Expo y trata de abrir Expo Go automáticamente. No cierres Termux mientras estés grabando o transcribiendo.
+El script comprueba el motor, inicia el servicio exclusivamente en
+`127.0.0.1:3000`, inicia Expo en modo local/sin internet y trata de abrir
+`exp://127.0.0.1:8081`. No necesitas escanear un QR desde otro equipo.
+Si no se abre automáticamente, introduce esa dirección en Expo Go.
 
-La separación es necesaria por seguridad y estabilidad: la clave de OpenAI nunca se guarda en el APK ni en el código visible de Expo, y FFmpeg no sobrecarga el teléfono. La API de transcripciones admite archivos de hasta 25 MB; este proyecto genera partes de diez minutos en MP3 mono a 48 kbps (aprox. 3,6 MB cada una).
+Deja Termux abierto; vuelve a Expo Go para grabar o seleccionar el audio.
+La pantalla se mantiene activa durante grabación y transcripción. Para parar el
+servicio, vuelve a Termux y usa Ctrl+C. Esto también detiene trabajos pendientes.
 
-## Funciones incluidas
+## Cómo funciona el audio largo
 
-- Grabación directa desde el teléfono.
-- Carga de archivos de audio desde Android.
-- Soporte para audios de más de una hora.
-- Pantalla activa durante una grabación extensa.
-- Estados en tiempo real: carga, división, parte actual y finalización.
-- Reintentos automáticos ante errores temporales de OpenAI.
-- Unión cronológica de todos los bloques.
-- Buscador con resaltado y contador de coincidencias.
-- Copia completa al portapapeles.
-- Borrado de audios y fragmentos temporales al finalizar.
+1. Expo envía el archivo únicamente al servicio del propio teléfono.
+2. FFmpeg convierte en disco a WAV PCM, mono, 16 kHz, 16 bits y segmentos de dos
+   minutos (unos 3,84 MB cada uno). No se carga el archivo completo en RAM.
+3. Node ejecuta `whisper-cli` sin shell, con idioma español y dos hilos.
+4. Se procesa un solo trabajo y un solo fragmento a la vez, conservando el orden.
+   Se admiten como máximo dos trabajos pendientes, contando las cargas.
+5. El progreso procede de los porcentajes reales del motor y de la parte actual.
+   No es una predicción exacta del tiempo restante.
+6. Se unen los textos en orden y se eliminan las copias temporales.
 
-## Estructura
+Ya no aplica el límite de 25 MB de la API: no se llama a esa API. Aun así, cada
+fragmento se valida por debajo de 24 MB para limitar consumo y conservar margen.
+Los cortes son temporales; una palabra que cruce un corte puede necesitar revisión.
+No hay identificación automática de hablantes.
 
-```text
-transcriptor-audiencias/
-├── App.js
-├── whisperService.js
-├── package.json
-├── app.json
-├── .env.example
-├── src/
-│   ├── components/ProgressPanel.js
-│   ├── screens/HomeScreen.js
-│   ├── screens/ResultsScreen.js
-│   └── services/whisperService.js
-└── server/
-    ├── package.json
-    ├── .env.example
-    └── src/
-        ├── index.js
-        ├── lib/jobs.js
-        ├── routes/transcriptions.js
-        └── services/
-            ├── audioSplitter.js
-            └── whisperService.js
+## Configuración opcional
+
+El instalador funciona sin editar archivos. Se pueden cambiar estas opciones en
+`server/.env` (rutas absolutas para binario/modelo):
+
+```dotenv
+HOST=127.0.0.1
+PORT=3000
+TRANSCRIPTION_LANGUAGE=es
+LOCAL_CHUNK_SECONDS=120
+WHISPER_THREADS=2
+WHISPER_CHUNK_TIMEOUT_MS=3600000
+MAX_CHUNK_BYTES=24000000
+MAX_UPLOAD_BYTES=2000000000
+# WHISPER_CPP_BIN=/ruta/al/whisper-cli
+# WHISPER_MODEL_PATH=/ruta/al/modelo-multilingue.bin
 ```
 
-## Requisitos
+El límite de tiempo es por fragmento. Un fallo detiene el trabajo sin presentar
+texto incompleto como completo. No se hacen reintentos hacia un servicio de pago.
+Más hilos no garantizan más velocidad y pueden aumentar temperatura/consumo.
 
-En el computador:
+La variable de la interfaz `EXPO_PUBLIC_API_URL` apunta al servicio local, por
+defecto `http://127.0.0.1:3000`. No almacenes secretos en variables `EXPO_PUBLIC_`.
 
-1. [Git](https://git-scm.com/downloads).
-2. [Node.js](https://nodejs.org/) 20.19 o superior.
-3. Una clave de la API de OpenAI con facturación habilitada. ChatGPT Plus no incluye automáticamente créditos para la API.
+## Clonar y desarrollar en computador (opcional)
 
-En el teléfono Android:
-
-1. Aplicación **Expo Go** instalada desde Google Play.
-2. Teléfono y computador conectados a la misma red Wi-Fi.
-
-El proyecto está fijado en Expo SDK 54 para coincidir con la versión de Expo Go indicada actualmente por la documentación de Expo para aprendizaje y pruebas en un teléfono físico.
-
-## 1. Clonar el repositorio
-
-Abre PowerShell, Terminal o la consola de VS Code en el computador y ejecuta:
+En Linux o macOS, instala Git, Node.js 20.19 o posterior, FFmpeg, CMake y un
+compilador C/C++. Después:
 
 ```bash
 git clone https://github.com/cynthiaantonuccicontreras-ux/transcriptor-audiencias.git
 cd transcriptor-audiencias
-```
-
-## 2. Instalar dependencias
-
-Instala la aplicación y el servidor:
-
-```bash
 npm install
-npm --prefix server install
+npm --prefix server install --omit=optional
+mkdir -p local-runtime
+git clone --depth 1 --branch v1.8.2 https://github.com/ggml-org/whisper.cpp.git local-runtime/whisper.cpp-1.8.2
+cmake -S local-runtime/whisper.cpp-1.8.2 -B local-runtime/whisper.cpp-1.8.2/build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DWHISPER_BUILD_TESTS=OFF -DWHISPER_BUILD_SERVER=OFF -DWHISPER_CURL=OFF
+cmake --build local-runtime/whisper.cpp-1.8.2/build --target whisper-cli --parallel 2
+mkdir -p local-runtime/models
+curl --fail --location https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base-q5_1.bin --output local-runtime/models/ggml-base-q5_1.bin
 ```
 
-`ffmpeg-static` instala el ejecutable de FFmpeg requerido por el servidor; no es necesario instalar FFmpeg manualmente.
-
-Para comprobar que las versiones coincidan con Expo SDK 54:
+Comprueba que el SHA-1 del modelo sea
+`a3733eda680ef76256db5fc5dd9de8629e62c5e7` con `sha1sum` (Linux) o `shasum`
+(macOS). En una terminal:
 
 ```bash
-npx expo install --fix
-npm run doctor
+cd server
+HOST=0.0.0.0 npm start
 ```
 
-## 3. Configurar la clave de OpenAI
-
-Copia el ejemplo del servidor:
-
-### Windows PowerShell
-
-```powershell
-Copy-Item server/.env.example server/.env
-```
-
-### macOS o Linux
+En otra, desde la raíz, reemplaza la IP por la del computador en tu Wi-Fi:
 
 ```bash
-cp server/.env.example server/.env
+EXPO_PUBLIC_API_URL=http://192.168.1.25:3000 npx expo start --lan
 ```
 
-Abre `server/.env` y reemplaza la primera línea por tu clave real:
+Abre Expo Go SDK 54 en Android, en la misma Wi-Fi, y escanea el QR. Este modo envía
+el audio al computador local, no a la nube. Sólo usa una red privada de confianza:
+el servidor no tiene autenticación ni HTTPS y **no debe exponerse a internet**.
+El modo Termux no usa `HOST=0.0.0.0`.
 
-```dotenv
-OPENAI_API_KEY=sk-tu-clave-real
-PORT=3000
-OPENAI_TRANSCRIPTION_MODEL=whisper-1
-TRANSCRIPTION_LANGUAGE=es
-CHUNK_DURATION_SECONDS=600
-MAX_CHUNK_BYTES=24000000
-MAX_UPLOAD_BYTES=2000000000
-```
+## Comprobaciones
 
-No subas `server/.env` a GitHub. Ya está excluido mediante `.gitignore`.
-
-## 4. Encontrar la IP local del computador
-
-La app del teléfono no puede usar `localhost`, porque en Android esa palabra apunta al propio teléfono.
-
-### Windows
-
-```powershell
-ipconfig
-```
-
-Busca **Dirección IPv4** en la conexión Wi-Fi. Un ejemplo habitual es `192.168.1.25`.
-
-### macOS
+Pruebas automáticas sin API ni clave:
 
 ```bash
-ipconfig getifaddr en0
+npm --prefix server run check
+npm --prefix server test
+bash -n scripts/setup-termux.sh scripts/setup-offline-termux.sh scripts/start-termux.sh
+npx expo export --platform android
 ```
 
-### Linux
+Se prueba configuración, orden, fallos, progreso partido entre eventos, cola,
+límite de tiempo y fragmentación con FFmpeg real. Para la prueba opcional del
+motor completo hace falta tener el binario compilado y el modelo descargado:
 
 ```bash
-hostname -I
+cd server
+RUN_WHISPER_INTEGRATION=1 RUN_LONG_AUDIO_TEST=1 npm test
 ```
 
-## 5. Configurar la dirección del servidor en Expo
+La integración usa el audio público de muestra de whisper.cpp y no una API.
+La prueba larga genera más de una hora de silencio y valida **la fragmentación**;
+no demuestra por sí sola la precisión o velocidad de transcripción.
 
-Copia el archivo de ejemplo de la raíz:
+Validación manual pendiente en Android: permisos de micrófono, abrir archivo,
+transcripción corta en español, copia/búsqueda, y luego un audio de más de una hora.
+Un bundle de Expo correcto no equivale a una prueba en un dispositivo físico.
 
-### Windows PowerShell
+En esta adaptación se verificaron nueve pruebas automáticas (incluida la API local
+con un motor simulado), la fragmentación real
+de 3601 segundos y la exportación Android. La prueba de inferencia real no pudo
+completarse en el entorno de desarrollo: el enlace generó un ejecutable vacío.
+No se afirma que el reconocimiento ni su rendimiento estén ya validados en Android.
 
-```powershell
-Copy-Item .env.example .env
-```
+## Si algo no funciona
 
-### macOS o Linux
+- **Pide una clave:** estás ejecutando el código antiguo. Detén el servicio y aplica
+  el comando de actualización de arriba. No crees una clave ni pagues créditos.
+- **Falta el motor/modelo:** vuelve a ejecutar `bash scripts/setup-offline-termux.sh`.
+- **CMake, descarga o checksum fallan:** detente y conserva el mensaje. No borres
+  Termux ni tus audios. Una descarga fallida no se usa como modelo.
+- **Expo Go incompatible:** selecciona SDK 54 en el enlace oficial de Expo Go.
+- **No responde el servicio:** mantén Termux abierto y vuelve a iniciar
+  `bash scripts/start-termux.sh`.
+- **Android cierra procesos o el teléfono se calienta:** usa un audio corto y espera
+  a que el dispositivo se enfríe. No prometemos ejecución en segundo plano.
+- **Resultado incorrecto:** el modelo pequeño tiene límites de precisión. Conserva
+  el original y revisa el texto; no sustituyas una comprobación humana por la app.
 
-```bash
-cp .env.example .env
-```
-
-Edita `.env` y reemplaza `TU_IP_LOCAL` por la IP encontrada:
-
-```dotenv
-EXPO_PUBLIC_API_URL=http://192.168.1.25:3000
-```
-
-No agregues `/api` al final y no uses la clave de OpenAI en este archivo. Las variables `EXPO_PUBLIC_` quedan visibles dentro de la aplicación.
-
-## 6. Iniciar el servidor Node.js
-
-En la primera terminal, desde la raíz del repositorio:
-
-```bash
-npm run server
-```
-
-Debe aparecer:
-
-```text
-Servidor listo en http://0.0.0.0:3000
-```
-
-Antes de abrir Expo, escribe en el navegador del teléfono la dirección de prueba, reemplazando la IP:
-
-```text
-http://192.168.1.25:3000/health
-```
-
-La respuesta correcta es:
-
-```json
-{"ok":true,"service":"transcriptor-audiencias"}
-```
-
-Si no abre, permite Node.js en el firewall del computador para redes privadas y confirma que ambos equipos estén en la misma Wi-Fi.
-
-## 7. Abrir la aplicación en Android con Expo Go
-
-Sin cerrar el servidor, abre una segunda terminal en la carpeta del proyecto:
-
-```bash
-npx expo start --lan --clear
-```
-
-Luego:
-
-1. Abre Expo Go en Android.
-2. Pulsa **Scan QR code**.
-3. Escanea el QR que aparece en la terminal o en el navegador del computador.
-4. Autoriza el micrófono cuando Android lo solicite.
-
-Para probar:
-
-1. Pulsa **Iniciar Grabación**.
-2. Pulsa **Detener y transcribir**, o usa **Subir Archivo de Audio**.
-3. Observa la barra de progreso.
-4. En resultados, busca una palabra o copia todo el texto.
-
-## Solución de problemas
-
-### Expo Go indica una versión de SDK incompatible
-
-Ejecuta:
-
-```bash
-npx expo install --fix
-npx expo start --clear
-```
-
-Verifica además que Expo Go esté actualizado. Este repositorio usa SDK 54 deliberadamente para la versión de Expo Go indicada en la guía oficial actual. Para una futura publicación en Google Play conviene migrar al SDK estable más reciente y crear un **development build**.
-
-### La app dice que falta `EXPO_PUBLIC_API_URL`
-
-Comprueba que `.env` esté en la raíz, que tenga la IP correcta y reinicia Expo con:
-
-```bash
-npx expo start --clear
-```
-
-### `Network Error` o el progreso no comienza
-
-- Abre `/health` desde el navegador del teléfono.
-- Mantén `npm run server` funcionando.
-- Usa la IP Wi-Fi, no `localhost` ni `127.0.0.1`.
-- Revisa el firewall y evita una red de invitados que aísle los dispositivos.
-
-### Error de autenticación o cuota de OpenAI
-
-Revisa `OPENAI_API_KEY`, el saldo y los límites del proyecto en la plataforma de OpenAI. La suscripción de ChatGPT y el uso de la API se facturan por separado.
-
-### El teléfono se queda sin espacio al escoger un audio enorme
-
-Expo copia el archivo seleccionado a la caché para poder subirlo. Libera espacio o usa una grabación comprimida (`m4a` o `mp3`). El servidor vuelve a comprimir el archivo antes de enviarlo a OpenAI.
-
-## Cómo funciona la fragmentación
-
-1. Android envía el archivo completo al servidor local.
-2. FFmpeg extrae el audio, lo convierte a mono, 16 kHz y 48 kbps.
-3. El audio se divide en bloques de diez minutos ordenados como `part-00000.mp3`, `part-00001.mp3`, etc.
-4. El servidor valida que cada bloque pese menos de 24 MB, dejando margen frente al máximo de 25 MB.
-5. Cada bloque se transcribe secuencialmente con `whisper-1`.
-6. El final del texto anterior se usa como contexto del bloque siguiente para mejorar continuidad y nombres propios.
-7. Los textos se unen en orden cronológico.
-8. Los archivos de audio temporales se borran; el resultado permanece en memoria durante 24 horas.
-
-## Privacidad y uso en producción
-
-Esta versión es un MVP funcional para uso personal en una red controlada. Antes de exponer el servidor en Internet o usarlo con expedientes de terceros, agrega autenticación, HTTPS, cifrado, una política de retención explícita, almacenamiento persistente protegido y control de acceso. No abras el puerto 3000 públicamente sin esas medidas.
-
-La clave de OpenAI vive únicamente en `server/.env`. Nunca la escribas en `App.js`, `whisperService.js` móvil ni en una variable `EXPO_PUBLIC_*`.
-
-## Documentación oficial
-
-- [OpenAI: transcripción de archivos y entradas largas](https://developers.openai.com/api/docs/guides/speech-to-text)
-- [Expo: crear y ejecutar un proyecto](https://docs.expo.dev/get-started/create-a-project/)
-- [Expo Audio](https://docs.expo.dev/versions/v54.0.0/sdk/audio/)
-- [Expo DocumentPicker](https://docs.expo.dev/versions/v54.0.0/sdk/document-picker/)
-- [Expo Clipboard](https://docs.expo.dev/versions/v54.0.0/sdk/clipboard/)
+Documentación de referencia: [whisper.cpp](https://github.com/ggml-org/whisper.cpp),
+[modelos](https://huggingface.co/ggerganov/whisper.cpp) y
+[Expo CLI sin conexión](https://docs.expo.dev/more/expo-cli/#offline).

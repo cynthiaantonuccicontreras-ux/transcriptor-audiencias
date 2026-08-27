@@ -19,6 +19,7 @@ import ProgressPanel from '../components/ProgressPanel';
 import { transcribeLongAudio } from '../services/whisperService';
 
 const KEEP_AWAKE_TAG = 'audiencia-recording';
+const PROCESSING_AWAKE_TAG = 'audiencia-transcription';
 
 function formatDuration(milliseconds = 0) {
   const totalSeconds = Math.floor(milliseconds / 1000);
@@ -44,6 +45,7 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     return () => {
       deactivateKeepAwake(KEEP_AWAKE_TAG).catch(() => undefined);
+      deactivateKeepAwake(PROCESSING_AWAKE_TAG).catch(() => undefined);
     };
   }, []);
 
@@ -57,6 +59,7 @@ export default function HomeScreen({ navigation }) {
     });
 
     try {
+      await activateKeepAwakeAsync(PROCESSING_AWAKE_TAG);
       const result = await transcribeLongAudio(audio, {
         onProgress: setProgressState,
       });
@@ -70,6 +73,7 @@ export default function HomeScreen({ navigation }) {
     } catch (error) {
       Alert.alert('No se pudo transcribir', error.message);
     } finally {
+      await deactivateKeepAwake(PROCESSING_AWAKE_TAG).catch(() => undefined);
       setIsProcessing(false);
     }
   };
@@ -198,8 +202,9 @@ export default function HomeScreen({ navigation }) {
           <Card.Content>
             <Text variant="titleSmall">Diseñada para audios extensos</Text>
             <Text variant="bodyMedium" style={styles.noteText}>
-              Puedes usar grabaciones de más de una hora. Mantén el computador
-              servidor encendido y el teléfono conectado a una red estable.
+              Transcripción gratuita en el teléfono, sin API ni clave. Mantén
+              Termux abierto. Un audio largo puede tardar y consumir bastante
+              batería; comienza probando 30 segundos.
             </Text>
           </Card.Content>
         </Card>
