@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Transcriptor de Audiencias",
+    "slug": "transcriptor-audiencias",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "android": {
+      "package": "cl.legalantonucci.transcriptoraudiencias",
+      "permissions": ["RECORD_AUDIO"]
+    },
+    "plugins": [
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Permite a Transcriptor de Audiencias usar el micrófono para grabar audio.",
+          "recordAudioAndroid": true
+        }
+      ]
+    ]
+  }
+}
