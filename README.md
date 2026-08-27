@@ -7,6 +7,32 @@ La solución usa dos piezas:
 - **Aplicación Expo:** interfaz, grabación, selección del archivo, progreso y resultados.
 - **Microservicio Node.js:** recibe el audio, lo convierte con FFmpeg a bloques livianos, los transcribe en orden y une el texto final.
 
+## Uso solo desde Android con Termux
+
+Si no tienes computador, el teléfono puede ejecutar tanto Expo como el servidor local. Usa una versión oficial de Termux instalada desde F-Droid o desde las publicaciones oficiales de GitHub; la antigua versión de Google Play puede ser incompatible.
+
+En Termux, copia y ejecuta esta línea completa:
+
+```bash
+pkg update -y && pkg install -y git && git clone https://github.com/cynthiaantonuccicontreras-ux/transcriptor-audiencias.git && cd transcriptor-audiencias && bash scripts/setup-termux.sh
+```
+
+Cuando termine, agrega tu clave de OpenAI:
+
+```bash
+nano server/.env
+```
+
+Reemplaza `sk-reemplaza-esta-linea` por la clave real. Guarda con **Ctrl + O**, confirma con **Enter** y sal con **Ctrl + X**.
+
+Para iniciar todo desde el teléfono:
+
+```bash
+cd ~/transcriptor-audiencias && bash scripts/start-termux.sh
+```
+
+El script mantiene activo el teléfono, inicia Node/FFmpeg, levanta Expo y trata de abrir Expo Go automáticamente. No cierres Termux mientras estés grabando o transcribiendo.
+
 La separación es necesaria por seguridad y estabilidad: la clave de OpenAI nunca se guarda en el APK ni en el código visible de Expo, y FFmpeg no sobrecarga el teléfono. La API de transcripciones admite archivos de hasta 25 MB; este proyecto genera partes de diez minutos en MP3 mono a 48 kbps (aprox. 3,6 MB cada una).
 
 ## Funciones incluidas

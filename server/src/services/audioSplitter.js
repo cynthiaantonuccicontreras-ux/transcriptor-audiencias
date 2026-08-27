@@ -1,7 +1,21 @@
 import { spawn } from 'node:child_process';
+import { createRequire } from 'node:module';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import ffmpegPath from 'ffmpeg-static';
+
+const require = createRequire(import.meta.url);
+
+function resolveFfmpegPath() {
+  if (process.env.FFMPEG_PATH) return process.env.FFMPEG_PATH;
+  try {
+    return require('ffmpeg-static');
+  } catch {
+    // En Termux, ffmpeg se instala con `pkg install ffmpeg` y queda en PATH.
+    return 'ffmpeg';
+  }
+}
+
+const ffmpegPath = resolveFfmpegPath();
 
 const DEFAULT_CHUNK_DURATION_SECONDS = 10 * 60;
 const DEFAULT_MAX_CHUNK_BYTES = 24_000_000;

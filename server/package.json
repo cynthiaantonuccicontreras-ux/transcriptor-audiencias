@@ -12,9 +12,11 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
-    "ffmpeg-static": "^5.2.0",
     "multer": "^2.0.2",
     "openai": "^5.12.2"
+  },
+  "optionalDependencies": {
+    "ffmpeg-static": "^5.2.0"
   },
   "engines": {
     "node": ">=20.19.0"
