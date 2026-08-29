@@ -34,6 +34,11 @@ const upload = multer({
   },
 });
 
+function safeFileName(value) {
+  if (typeof value !== 'string') return 'audio-sin-nombre';
+  return value.trim().slice(0, 500) || 'audio-sin-nombre';
+}
+
 async function removePath(targetPath) {
   if (!targetPath) return;
   await fs.rm(targetPath, { recursive: true, force: true });
@@ -124,7 +129,59 @@ router.post('/', async (request, response, next) => {
     return;
   }
 
-  const job = createJob(request.body.originalName || request.file.originalname);
+  const job = createJob(safeFileName(request.body?.originalName || request.file.originalname));
+  response.status(202).json({ jobId: job.id });
+  void enqueue(() => processJob(job.id, request.file.path));
+});
+
+router.post('/jobs', (request, response) => {
+  const job = createJob(safeFileName(request.body?.fileName));
+  console.log(`[job ${job.id}] creado para ${job.fileName}`);
+  response.status(201).json({ jobId: job.id });
+});
+
+router.post('/:jobId/audio', async (request, response, next) => {
+  const job = getJob(request.params.jobId);
+  if (!job) {
+    response.status(404).json({ error: 'La carga no tiene una transcripción asociada.' });
+    return;
+  }
+  if (job.status !== 'queued') {
+    response.status(409).json({ error: 'Esta transcripción ya recibió un archivo.' });
+    return;
+  }
+  if (pendingJobs >= 2) {
+    response.status(429).json({ error: 'Ya hay dos audios pendientes. Espera a que terminen.' });
+    return;
+  }
+  pendingJobs += 1;
+  try {
+    await assertLocalEngineAvailable();
+  } catch (error) {
+    pendingJobs -= 1;
+    updateJob(job.id, { status: 'failed', message: 'Motor local no disponible', error: error.message });
+    response.status(503).json({ error: error.message });
+    return;
+  }
+  upload.single('audio')(request, response, (error) => {
+    if (error) {
+      pendingJobs -= 1;
+      updateJob(job.id, { status: 'failed', message: 'Error al recibir el audio', error: error.message });
+      next(error);
+      return;
+    }
+    next();
+  });
+}, (request, response) => {
+  const job = getJob(request.params.jobId);
+  if (!request.file) {
+    pendingJobs -= 1;
+    updateJob(job.id, { status: 'failed', message: 'Archivo ausente', error: 'Debes adjuntar un audio.' });
+    response.status(400).json({ error: 'Debes adjuntar el campo de audio.' });
+    return;
+  }
+
+  console.log(`[job ${job.id}] audio recibido (${request.file.size} bytes)`);
   response.status(202).json({ jobId: job.id });
   void enqueue(() => processJob(job.id, request.file.path));
 });
