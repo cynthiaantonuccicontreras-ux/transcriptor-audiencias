@@ -137,6 +137,7 @@ export default function HomeScreen({ navigation }) {
         uri: asset.uri,
         name: asset.name,
         mimeType: asset.mimeType,
+        size: asset.size,
       });
     } catch (error) {
       Alert.alert('No se pudo abrir el archivo', error.message);
