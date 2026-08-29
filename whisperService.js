@@ -1,6 +1,8 @@
 import axios from 'axios';
+import * as FileSystem from 'expo-file-system/legacy';
 
 const POLL_INTERVAL_MS = 1200;
+const UPLOAD_TIMEOUT_MS = 10 * 60 * 1000;
 const API_URL = (process.env.EXPO_PUBLIC_API_URL || 'http://127.0.0.1:3000').replace(/\/$/, '');
 
 const wait = (milliseconds) =>
@@ -34,8 +36,6 @@ function normalizeAudio(audio) {
 export async function transcribeLongAudio(audio, { onProgress, signal } = {}) {
   assertApiUrl();
   const file = normalizeAudio(audio);
-  const formData = new FormData();
-  formData.append('audio', file);
 
   onProgress?.({
     status: 'Subiendo audio...',
@@ -44,28 +44,76 @@ export async function transcribeLongAudio(audio, { onProgress, signal } = {}) {
     totalParts: 0,
   });
 
-  const uploadResponse = await axios.post(
+  const uploadTask = FileSystem.createUploadTask(
     `${API_URL}/api/transcriptions`,
-    formData,
+    file.uri,
     {
-      headers: { 'Content-Type': 'multipart/form-data' },
-      signal,
-      timeout: 0,
-      onUploadProgress: ({ loaded, total }) => {
-        if (!total) return;
-        onProgress?.({
-          status: 'Subiendo audio...',
-          progress: Math.min(0.09, 0.02 + (loaded / total) * 0.07),
-          currentPart: 0,
-          totalParts: 0,
-        });
-      },
+      httpMethod: 'POST',
+      uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+      fieldName: 'audio',
+      mimeType: file.type,
+      parameters: { originalName: file.name },
+    },
+    ({ totalBytesSent, totalBytesExpectedToSend }) => {
+      if (totalBytesExpectedToSend <= 0) return;
+      onProgress?.({
+        status: 'Subiendo audio...',
+        progress: Math.min(
+          0.09,
+          0.02 + (totalBytesSent / totalBytesExpectedToSend) * 0.07
+        ),
+        currentPart: 0,
+        totalParts: 0,
+      });
     }
-  ).catch((error) => {
-    throw new Error(error.response?.data?.error || 'No responde Termux. Mantén abierto el servicio local e inténtalo de nuevo.');
-  });
+  );
 
-  const { jobId } = uploadResponse.data;
+  let timeoutId;
+  const abortUpload = () => {
+    uploadTask.cancelAsync().catch(() => undefined);
+  };
+  signal?.addEventListener?.('abort', abortUpload, { once: true });
+
+  let uploadResult;
+  try {
+    uploadResult = await Promise.race([
+      uploadTask.uploadAsync(),
+      new Promise((_, reject) => {
+        timeoutId = setTimeout(() => {
+          abortUpload();
+          reject(
+            new Error(
+              'La carga tardó más de 10 minutos y se canceló. Inténtalo nuevamente.'
+            )
+          );
+        }, UPLOAD_TIMEOUT_MS);
+      }),
+    ]);
+  } catch (error) {
+    if (error?.message?.includes('10 minutos')) throw error;
+    throw new Error(
+      'No responde Termux o no fue posible leer el archivo. Mantén abierto el servicio local e inténtalo de nuevo.'
+    );
+  } finally {
+    clearTimeout(timeoutId);
+    signal?.removeEventListener?.('abort', abortUpload);
+  }
+
+  if (!uploadResult) {
+    throw new Error('La carga del audio fue cancelada.');
+  }
+
+  let uploadData;
+  try {
+    uploadData = JSON.parse(uploadResult.body || '{}');
+  } catch {
+    throw new Error('Termux devolvió una respuesta inválida al subir el audio.');
+  }
+  if (uploadResult.status < 200 || uploadResult.status >= 300) {
+    throw new Error(uploadData.error || 'Termux rechazó el archivo seleccionado.');
+  }
+
+  const { jobId } = uploadData;
   if (!jobId) {
     throw new Error('El servidor no devolvió un identificador de transcripción.');
   }
