@@ -57,6 +57,30 @@ test('HTTP y limpieza con motor SIMULADO (no valida reconocimiento)', { timeout:
   assert.equal(completed.text, 'Texto simulado\n\nTexto simulado\n\nTexto simulado');
   assert.equal(completed.totalParts, 3);
   assert.equal(completed.progress, 100);
+
+  const createdResponse = await fetch(url + '/api/transcriptions/jobs', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fileName: 'audiencia dos.mp3' }),
+  });
+  assert.equal(createdResponse.status, 201);
+  const created = await createdResponse.json();
+  assert.match(created.jobId, /^[0-9a-f-]+$/);
+  const nativeForm = new FormData();
+  nativeForm.append('audio', new Blob([await fs.readFile(input)], { type: 'audio/wav' }), 'audio.wav');
+  const nativeUpload = await fetch(url + '/api/transcriptions/' + created.jobId + '/audio', {
+    method: 'POST', body: nativeForm,
+  });
+  assert.equal(nativeUpload.status, 202);
+  assert.equal((await nativeUpload.json()).jobId, created.jobId);
+  let nativeJob;
+  for (let i = 0; i < 100; i++) {
+    nativeJob = await (await fetch(url + '/api/transcriptions/' + created.jobId)).json();
+    if (['completed', 'failed'].includes(nativeJob.status)) break;
+    await pause();
+  }
+  assert.equal(nativeJob.status, 'completed', nativeJob.error);
+  assert.equal(nativeJob.fileName, 'audiencia dos.mp3');
+
   const failed = await submit(Buffer.from('invalid audio'));
   assert.equal(failed.status, 'failed');
   assert.equal(failed.text, undefined);
