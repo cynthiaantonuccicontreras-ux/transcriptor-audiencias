@@ -38,14 +38,32 @@ export async function transcribeLongAudio(audio, { onProgress, signal } = {}) {
   const file = normalizeAudio(audio);
 
   onProgress?.({
-    status: 'Subiendo audio...',
-    progress: 0.02,
+    status: 'Preparando carga...',
+    progress: 0.01,
     currentPart: 0,
     totalParts: 0,
   });
 
+  let jobId;
+  try {
+    const createResponse = await axios.post(
+      `${API_URL}/api/transcriptions/jobs`,
+      { fileName: file.name },
+      { signal, timeout: 15000 }
+    );
+    jobId = createResponse.data?.jobId;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.error ||
+        'No se pudo iniciar la carga en Termux. Reinicia el servicio local e inténtalo nuevamente.'
+    );
+  }
+  if (!jobId) {
+    throw new Error('Termux no devolvió el identificador de la transcripción.');
+  }
+
   const uploadTask = FileSystem.createUploadTask(
-    `${API_URL}/api/transcriptions`,
+    `${API_URL}/api/transcriptions/${encodeURIComponent(jobId)}/audio`,
     file.uri,
     {
       httpMethod: 'POST',
@@ -113,21 +131,34 @@ export async function transcribeLongAudio(audio, { onProgress, signal } = {}) {
     throw new Error(uploadData.error || 'Termux rechazó el archivo seleccionado.');
   }
 
-  const { jobId } = uploadData;
-  if (!jobId) {
-    throw new Error('El servidor no devolvió un identificador de transcripción.');
+  if (uploadData.jobId && uploadData.jobId !== jobId) {
+    throw new Error('Termux devolvió un identificador de transcripción inesperado.');
   }
 
+  let missingJobAttempts = 0;
   while (true) {
     if (signal?.aborted) {
       throw new Error('Transcripción cancelada.');
     }
 
     await wait(POLL_INTERVAL_MS);
-    const response = await axios.get(
-      `${API_URL}/api/transcriptions/${jobId}`,
-      { signal, timeout: 15000 }
-    );
+    let response;
+    try {
+      response = await axios.get(
+        `${API_URL}/api/transcriptions/${encodeURIComponent(jobId)}`,
+        { signal, timeout: 15000 }
+      );
+      missingJobAttempts = 0;
+    } catch (error) {
+      if (error.response?.status === 404 && missingJobAttempts < 4) {
+        missingJobAttempts += 1;
+        continue;
+      }
+      throw new Error(
+        error.response?.data?.error ||
+          'Se perdió la comunicación con la transcripción. Mantén Termux abierto e inténtalo nuevamente.'
+      );
+    }
     const job = response.data;
 
     onProgress?.({
