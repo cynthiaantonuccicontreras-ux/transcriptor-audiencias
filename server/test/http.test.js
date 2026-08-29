@@ -60,7 +60,7 @@ test('HTTP y limpieza con motor SIMULADO (no valida reconocimiento)', { timeout:
 
   const createdResponse = await fetch(url + '/api/transcriptions/jobs', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ fileName: 'audiencia dos.mp3' }),
+    body: JSON.stringify({ fileName: 'audiencia dos.mp3', fileSize: (await fs.stat(input)).size }),
   });
   assert.equal(createdResponse.status, 201);
   const created = await createdResponse.json();
@@ -80,6 +80,35 @@ test('HTTP y limpieza con motor SIMULADO (no valida reconocimiento)', { timeout:
   }
   assert.equal(nativeJob.status, 'completed', nativeJob.error);
   assert.equal(nativeJob.fileName, 'audiencia dos.mp3');
+
+  const chunkedInput = await fs.readFile(input);
+  const chunkedCreatedResponse = await fetch(url + '/api/transcriptions/jobs', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fileName: 'audiencia por partes.wav', fileSize: chunkedInput.length }),
+  });
+  assert.equal(chunkedCreatedResponse.status, 201);
+  const chunkedCreated = await chunkedCreatedResponse.json();
+  let offset = 0;
+  while (offset < chunkedInput.length) {
+    const bytes = chunkedInput.subarray(offset, Math.min(offset + 1000, chunkedInput.length));
+    const nextOffset = offset + bytes.length;
+    const chunkResponse = await fetch(url + '/api/transcriptions/' + chunkedCreated.jobId + '/chunks', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ offset, data: bytes.toString('base64'),
+        totalBytes: chunkedInput.length, isLast: nextOffset === chunkedInput.length }),
+    });
+    assert.equal(chunkResponse.status, nextOffset === chunkedInput.length ? 202 : 200);
+    assert.equal((await chunkResponse.json()).nextOffset, nextOffset);
+    offset = nextOffset;
+  }
+  let chunkedJob;
+  for (let i = 0; i < 100; i++) {
+    chunkedJob = await (await fetch(url + '/api/transcriptions/' + chunkedCreated.jobId)).json();
+    if (['completed', 'failed'].includes(chunkedJob.status)) break;
+    await pause();
+  }
+  assert.equal(chunkedJob.status, 'completed', chunkedJob.error);
+  assert.equal(chunkedJob.fileName, 'audiencia por partes.wav');
 
   const failed = await submit(Buffer.from('invalid audio'));
   assert.equal(failed.status, 'failed');
