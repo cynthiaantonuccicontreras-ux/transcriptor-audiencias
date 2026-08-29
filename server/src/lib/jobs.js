@@ -57,6 +57,6 @@ export function getPublicJob(job) {
 setInterval(() => {
   const cutoff = Date.now() - JOB_TTL_MS;
   for (const [id, job] of jobs.entries()) {
-    if (['completed', 'failed'].includes(job.status) && Date.parse(job.updatedAt) < cutoff) jobs.delete(id);
+    if (Date.parse(job.updatedAt) < cutoff) jobs.delete(id);
   }
 }, 60 * 60 * 1000).unref();
