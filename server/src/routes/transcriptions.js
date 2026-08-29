@@ -124,7 +124,7 @@ router.post('/', async (request, response, next) => {
     return;
   }
 
-  const job = createJob(request.file.originalname);
+  const job = createJob(request.body.originalName || request.file.originalname);
   response.status(202).json({ jobId: job.id });
   void enqueue(() => processJob(job.id, request.file.path));
 });
