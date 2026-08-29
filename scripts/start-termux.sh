@@ -53,8 +53,36 @@ fi
 echo "Servicio local listo. Necesitas Expo Go compatible con SDK 54."
 echo "No cierres Termux. Los audios largos pueden tardar y calentar el teléfono."
 (
-  sleep 12
-  termux-open-url 'exp://127.0.0.1:8081' 2>/dev/null || true
+  echo "Preparando la aplicación. Puede tardar varios minutos la primera vez..."
+  BUNDLE_URL=""
+  for attempt in $(seq 1 180); do
+    MANIFEST_JSON="$(
+      curl --fail --silent --connect-timeout 1 --max-time 2 \
+        -H 'expo-platform: android' \
+        -H 'expo-protocol-version: 0' \
+        -H 'accept: application/expo+json,application/json' \
+        http://127.0.0.1:8081/ 2>/dev/null || true
+    )"
+    if [ -n "$MANIFEST_JSON" ]; then
+      BUNDLE_URL="$(
+        printf '%s' "$MANIFEST_JSON" \
+          | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{process.stdout.write(JSON.parse(s).launchAsset?.url||'')}catch{process.exit(1)}})" \
+          2>/dev/null || true
+      )"
+      if [ -n "$BUNDLE_URL" ]; then break; fi
+    fi
+    sleep 1
+  done
+  if [ -z "$BUNDLE_URL" ]; then
+    echo "Expo no terminó de iniciar. Envía una captura de Termux."
+    exit 1
+  fi
+  if curl --fail --silent --show-error --max-time 900 --output /dev/null "$BUNDLE_URL"; then
+    echo "Aplicación preparada. Abriendo Expo Go..."
+    termux-open-url 'exp://127.0.0.1:8081' 2>/dev/null || true
+  else
+    echo "No se pudo preparar la aplicación. Envía una captura de Termux."
+  fi
 ) &
 OPENER_PID=$!
 EXPO_PUBLIC_API_URL="http://127.0.0.1:3000" EXPO_NO_TELEMETRY=1 \
