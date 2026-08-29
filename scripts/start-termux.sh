@@ -58,4 +58,5 @@ echo "No cierres Termux. Los audios largos pueden tardar y calentar el teléfono
 ) &
 OPENER_PID=$!
 EXPO_PUBLIC_API_URL="http://127.0.0.1:3000" EXPO_NO_TELEMETRY=1 \
-  node node_modules/expo/bin/cli start --offline --localhost --go --port 8081 --max-workers 2
+  EXPO_NO_TYPESCRIPT_SETUP=1 \
+  node node_modules/expo/bin/cli start --offline --go --port 8081 --max-workers 2
