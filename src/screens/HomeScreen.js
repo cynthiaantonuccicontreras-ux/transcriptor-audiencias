@@ -123,7 +123,10 @@ export default function HomeScreen({ navigation }) {
   const pickAudio = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: ['audio/*', 'video/mp4'],
+        // PJUD y otros portales a veces guardan audios como
+        // application/octet-stream. Mostrar todos los archivos evita que el
+        // selector de Android los oculte aunque FFmpeg sí pueda leerlos.
+        type: '*/*',
         copyToCacheDirectory: true,
         multiple: false,
       });
