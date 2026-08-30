@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#14213a" />
+    <meta name="color-scheme" content="light" />
+    <title>Transcriptor de Audiencias</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <span class="brand-mark" aria-hidden="true">T</span>
+        <strong>Transcriptor de Audiencias</strong>
+      </div>
+    </header>
+
+    <main class="page">
+      <section id="homeView">
+        <div class="hero">
+          <p class="eyebrow">GRATUITO · PRIVADO · EN TU TELÉFONO</p>
+          <h1>Convierte audiencias largas en texto</h1>
+          <p>Selecciona una grabación o graba desde el teléfono. El audio no sale del dispositivo.</p>
+        </div>
+
+        <div id="serviceStatus" class="service-status" role="status" aria-live="polite">
+          <span class="status-dot"></span>
+          <span>Comprobando el servicio local…</span>
+        </div>
+
+        <div class="actions">
+          <button id="chooseButton" class="button primary" type="button" disabled>
+            <span aria-hidden="true">＋</span> Elegir archivo de audio
+          </button>
+          <input id="audioFile" type="file" hidden />
+          <button id="recordButton" class="button secondary" type="button" disabled>
+            <span aria-hidden="true">●</span> Grabar ahora
+          </button>
+          <p id="recordingTimer" class="recording-timer" hidden>Grabando · 00:00</p>
+        </div>
+
+        <section id="progressCard" class="card progress-card" hidden aria-live="polite">
+          <div class="progress-heading">
+            <strong id="progressStatus">Preparando…</strong>
+            <strong id="progressPercent">0%</strong>
+          </div>
+          <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+          <p id="progressDetail" class="muted"></p>
+        </section>
+
+        <p id="errorBox" class="error-box" role="alert" hidden></p>
+
+        <aside class="card note-card">
+          <strong>Diseñada para audios extensos</strong>
+          <p>Termux debe permanecer abierto. La transcripción se realiza con Whisper en el teléfono y puede tardar según la duración del audio.</p>
+        </aside>
+      </section>
+
+      <section id="resultView" hidden>
+        <button id="backButton" class="text-button" type="button">← Nueva transcripción</button>
+        <p class="eyebrow">TRANSCRIPCIÓN FINALIZADA</p>
+        <h1 id="resultFileName" class="result-title"></h1>
+        <p class="muted">Borrador automático: revisa nombres, cifras y citas contra el audio.</p>
+        <textarea id="resultText" class="result-text" readonly aria-label="Texto transcrito"></textarea>
+        <div class="result-actions">
+          <button id="copyButton" class="button primary" type="button">Copiar texto</button>
+          <button id="downloadButton" class="button secondary" type="button">Guardar .txt</button>
+        </div>
+        <p id="copyMessage" class="success-message" hidden>Texto copiado.</p>
+      </section>
+    </main>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>
