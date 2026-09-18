@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#08172c">
+  <title>VENLIORA | Managed AI Operations para empresas de servicios</title>
+  <meta name="description" content="VENLIORA diseña, implementa y opera sistemas de IA y automatización para ventas, CRM, propuestas, onboarding, delivery, cobranza y reporting en empresas de servicios.">
+  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9IiMwQjFFM0IiLz48cGF0aCBkPSJNMTUgMThoOWw4IDI0IDgtMjRoOUwzNyA0OUgyN0wxNSAxOFoiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNNDIgMThoN2wtOCAyMmgtN2w4LTIyWiIgZmlsbD0iIzZGN0JGRiIvPjwvc3ZnPgo=" type="image/svg+xml">
+  <style>:root{
+  --navy:#08172c;
+  --navy-2:#0b1e3b;
+  --blue:#315bd8;
+  --indigo:#5f63ea;
+  --indigo-2:#7a7df2;
+  --sky:#7fb5ff;
+  --ink:#0e1726;
+  --muted:#5d6878;
+  --line:#dfe4ea;
+  --soft:#f4f6f8;
+  --paper:#ffffff;
+  --cream:#f7f3ea;
+  --success:#0d7b67;
+  --max:1240px;
+  --radius:22px;
+  --shadow:0 24px 70px rgba(8,23,44,.10);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:92px}
+body{margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;color:var(--ink);background:var(--paper);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button,input,textarea{font:inherit}
+img,svg{display:block;max-width:100%}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.skip-link{position:fixed;left:12px;top:-60px;background:#fff;color:var(--navy);padding:10px 14px;border-radius:8px;z-index:9999;box-shadow:var(--shadow)}
+.skip-link:focus{top:12px}
+.container{width:min(var(--max),calc(100% - 48px));margin-inline:auto}
+.kicker{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--indigo);margin-bottom:18px}
+.kicker:before{content:"";width:24px;height:2px;background:currentColor;border-radius:999px}
+.display{font-family:"Manrope",Inter,sans-serif;letter-spacing:-.045em;line-height:1.03;margin:0}
+.section-title{font-family:"Manrope",Inter,sans-serif;font-size:clamp(34px,4.4vw,58px);letter-spacing:-.042em;line-height:1.07;margin:0 0 18px;max-width:820px}
+.section-lead{font-size:19px;color:var(--muted);max-width:760px;margin:0}
+.section{padding:104px 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 20px;border:1px solid transparent;border-radius:12px;font-weight:800;font-size:14px;transition:.2s ease;cursor:pointer}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:var(--navy);color:#fff;box-shadow:0 10px 24px rgba(8,23,44,.16)}
+.btn-primary:hover{background:#10274a}
+.btn-light{background:#fff;color:var(--navy)}
+.btn-ghost{border-color:#cdd4dd;background:transparent;color:var(--ink)}
+.btn-ghost:hover{border-color:#9ca7b7;background:#fff}
+.btn-indigo{background:var(--indigo);color:#fff}
+.icon-arrow{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* Header */
+.site-header{position:sticky;top:0;z-index:1000;background:rgba(255,255,255,.94);backdrop-filter:saturate(140%) blur(14px);border-bottom:1px solid rgba(223,228,234,.9)}
+.header-inner{height:84px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{display:flex;align-items:center;gap:12px;font-family:"Manrope",Inter,sans-serif;font-weight:800;letter-spacing:.14em;font-size:17px}
+.brand img{width:38px;height:38px}
+.nav-desktop{display:flex;align-items:center;gap:28px;margin-left:auto}
+.nav-item{position:relative}
+.nav-link{border:0;background:transparent;padding:30px 0 29px;color:#25324a;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px}
+.nav-link:hover,.nav-link:focus-visible{color:var(--indigo)}
+.chev{width:13px;height:13px;transition:transform .2s}
+.nav-item:hover .chev,.nav-item:focus-within .chev{transform:rotate(180deg)}
+.mega{position:absolute;left:50%;top:72px;transform:translate(-50%,10px);width:520px;padding:16px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 80px rgba(8,23,44,.16);opacity:0;pointer-events:none;transition:.18s ease}
+.nav-item:hover .mega,.nav-item:focus-within .mega{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+.mega-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mega a{display:block;padding:14px;border-radius:10px}
+.mega a:hover{background:var(--soft)}
+.mega strong{display:block;font-size:14px;margin-bottom:3px}
+.mega span{display:block;font-size:12px;color:var(--muted);line-height:1.4}
+.header-actions{display:flex;align-items:center;gap:10px}
+.lang-switch{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.lang-switch a{padding:8px 10px;font-size:12px;font-weight:800;color:var(--muted)}
+.lang-switch a[aria-current="page"]{background:var(--navy);color:#fff}
+.menu-btn{display:none;width:44px;height:44px;border:0;background:var(--navy);border-radius:10px;padding:0;align-items:center;justify-content:center;cursor:pointer}
+.menu-btn span,.menu-btn span:before,.menu-btn span:after{content:"";display:block;width:20px;height:2px;background:#fff;border-radius:10px;position:relative;transition:.2s}
+.menu-btn span:before{position:absolute;top:-6px}.menu-btn span:after{position:absolute;top:6px}
+.menu-btn[aria-expanded="true"] span{background:transparent}.menu-btn[aria-expanded="true"] span:before{top:0;transform:rotate(45deg)}.menu-btn[aria-expanded="true"] span:after{top:0;transform:rotate(-45deg)}
+.mobile-drawer{display:none;position:fixed;inset:84px 0 0 0;background:rgba(8,23,44,.56);z-index:990}
+.mobile-panel{margin-left:auto;height:100%;width:min(92%,540px);background:#fff;overflow:auto;padding:26px 28px 60px;box-shadow:-30px 0 70px rgba(8,23,44,.18)}
+.mobile-drawer.open{display:block}
+.mobile-row{border-bottom:1px solid var(--line)}
+.mobile-row>a,.mobile-accordion{display:flex;align-items:center;justify-content:space-between;width:100%;padding:19px 0;border:0;background:transparent;color:var(--navy);font-size:18px;font-weight:750;text-align:left}
+.mobile-submenu{display:none;padding:0 0 14px}
+.mobile-submenu.open{display:block}
+.mobile-submenu a{display:block;padding:12px 12px;border-radius:8px;color:#344156}
+.mobile-submenu a:hover{background:var(--soft)}
+.mobile-meta{margin-top:26px;padding:20px;border-radius:14px;background:var(--soft);font-size:13px;color:var(--muted)}
+
+/* Hero */
+.hero{background:linear-gradient(180deg,#fff 0%,#f8f9fb 100%);padding:82px 0 54px;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(420px,.95fr);gap:54px;align-items:center}
+.hero h1{font-size:clamp(48px,6.4vw,82px);max-width:780px}
+.hero h1 .accent{color:var(--indigo)}
+.hero-copy{font-size:20px;color:var(--muted);max-width:690px;margin:26px 0 0}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.hero-meta{display:flex;gap:20px;flex-wrap:wrap;margin-top:34px;padding-top:24px;border-top:1px solid var(--line)}
+.hero-meta span{font-size:13px;font-weight:700;color:#4a5668;display:flex;align-items:center;gap:8px}
+.hero-meta i{width:8px;height:8px;border-radius:50%;background:var(--success);display:inline-block}
+.ops-visual{position:relative;min-height:580px;border-radius:28px;background:var(--navy);box-shadow:var(--shadow);padding:28px;overflow:hidden}
+.ops-visual:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(to bottom,#000 35%,transparent 100%)}
+.visual-top{position:relative;display:flex;align-items:center;justify-content:space-between;color:#fff;margin-bottom:26px}
+.visual-title{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;opacity:.75}
+.visual-status{font-size:12px;padding:7px 10px;border:1px solid rgba(255,255,255,.15);border-radius:999px;color:#cdd8e7;background:rgba(255,255,255,.05)}
+.flow-map{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.flow-card{position:relative;z-index:2;min-height:118px;background:#fff;border-radius:15px;padding:17px 18px;box-shadow:0 12px 26px rgba(0,0,0,.14)}
+.flow-card small{display:flex;align-items:center;gap:8px;color:#6b7482;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.flow-card small i{width:9px;height:9px;border-radius:3px;background:var(--indigo)}
+.flow-card h3{font-size:16px;margin:14px 0 5px}.flow-card p{font-size:12px;line-height:1.45;color:#687486;margin:0}
+.flow-card.emphasis{grid-column:1/-1;background:#eef0ff;border:1px solid #c9ccff;display:grid;grid-template-columns:1fr auto;align-items:center;gap:20px}
+.flow-card.emphasis .score{font-family:"Manrope";font-size:42px;font-weight:800;color:var(--navy);letter-spacing:-.05em}
+.signal-row{position:relative;z-index:2;margin-top:14px;background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.11);border-radius:15px;padding:16px;color:#fff}
+.signal-row strong{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:9px;color:#b9c5d8}
+.signal-list{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.signal{padding:10px 11px;border-radius:10px;background:rgba(255,255,255,.07);font-size:11px;color:#dfe8f5}
+
+/* Trust strip */
+.trust-strip{border-block:1px solid var(--line);background:#fff}
+.trust-grid{display:grid;grid-template-columns:1.25fr repeat(3,1fr)}
+.trust-cell{padding:28px 28px;border-right:1px solid var(--line)}
+.trust-cell:last-child{border-right:0}.trust-cell b{font-family:"Manrope";display:block;font-size:28px;letter-spacing:-.04em;color:var(--navy)}.trust-cell span{display:block;font-size:12px;color:var(--muted);margin-top:3px}.trust-intro{font-size:14px;color:#38465a;display:flex;align-items:center}
+
+/* Solutions */
+.solutions{background:#fff}
+.section-head{display:flex;justify-content:space-between;gap:40px;align-items:flex-end;margin-bottom:48px}
+.section-head .section-lead{max-width:520px}
+.solution-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.solution-card{min-height:300px;border:1px solid var(--line);border-radius:18px;padding:28px;display:flex;flex-direction:column;transition:.2s ease;background:#fff}
+.solution-card:hover{transform:translateY(-4px);box-shadow:0 22px 45px rgba(8,23,44,.09);border-color:#cbd3df}
+.solution-icon{width:48px;height:48px;border-radius:12px;background:#eef0ff;display:grid;place-items:center;margin-bottom:48px}
+.solution-icon svg{width:25px;height:25px;stroke:var(--indigo);fill:none;stroke-width:1.8}
+.solution-card h3{font-size:22px;line-height:1.18;margin:0 0 11px;letter-spacing:-.025em}.solution-card p{color:var(--muted);font-size:14px;margin:0 0 20px}.solution-card a{margin-top:auto;font-size:13px;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:6px}
+
+/* System / Process */
+.system{background:var(--navy);color:#fff;overflow:hidden}
+.system .kicker{color:#91a5ff}.system .section-lead{color:#b7c2d3}
+.system-layout{display:grid;grid-template-columns:.8fr 1.2fr;gap:70px;align-items:start}
+.system-sticky{position:sticky;top:120px}
+.process{display:grid;gap:14px}
+.process-step{display:grid;grid-template-columns:56px 1fr;gap:20px;padding:24px;border:1px solid rgba(255,255,255,.11);border-radius:16px;background:rgba(255,255,255,.045)}
+.process-no{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--navy);font-weight:900;font-size:13px}.process-step h3{margin:0 0 5px;font-size:19px}.process-step p{margin:0;color:#b9c3d2;font-size:14px}.process-step strong{color:#fff}
+
+/* Industries */
+.industries{background:var(--soft)}
+.industry-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:42px}
+.industry-card{position:relative;min-height:360px;border-radius:18px;overflow:hidden;padding:28px;color:#fff;background:var(--navy-2);display:flex;align-items:flex-end}
+.industry-card:before,.industry-card:after{content:"";position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.15)}
+.industry-card:before{width:260px;height:260px;right:-80px;top:-70px}.industry-card:after{width:170px;height:170px;right:40px;top:30px}
+.industry-card:nth-child(2){background:#183c57}.industry-card:nth-child(3){background:#304e6e}.industry-card:nth-child(4){background:#2a3465}.industry-card:nth-child(5){background:#22413f}.industry-card:nth-child(6){background:#39434f}
+.industry-content{position:relative;z-index:2}.industry-content small{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#bdc9d9;font-weight:800}.industry-content h3{font-size:30px;line-height:1.08;margin:9px 0 10px;letter-spacing:-.03em}.industry-content p{color:#d8e0eb;font-size:13px;max-width:310px;margin:0}
+
+/* Governance */
+.governance-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:44px}
+.governance-card{padding:30px;border-radius:18px;border:1px solid var(--line);background:#fff}.governance-card h3{font-size:23px;margin:0 0 10px}.governance-card p{font-size:14px;color:var(--muted);margin:0}.governance-card.highlight{background:var(--cream);border-color:#e7decb}
+.rule-list{margin:22px 0 0;padding:0;list-style:none;display:grid;gap:12px}.rule-list li{display:flex;gap:10px;color:#39465a;font-size:14px}.rule-list li:before{content:"✓";font-weight:900;color:var(--success)}
+
+/* Pilot proof */
+.pilot{background:#eef0ff}
+.pilot-layout{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.metric-panel{background:#fff;border-radius:22px;padding:28px;border:1px solid #d7d9ff;box-shadow:0 18px 46px rgba(49,91,216,.09)}
+.metric-panel h3{margin:0 0 8px;font-size:22px}.metric-panel>p{margin:0;color:var(--muted);font-size:14px}
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px}.metric{background:var(--soft);border-radius:12px;padding:18px}.metric small{display:block;color:#6f7a8b;font-size:11px;text-transform:uppercase;letter-spacing:.09em;font-weight:800}.metric strong{display:block;margin-top:8px;font-size:17px}.pilot-note{margin-top:16px;font-size:12px;color:#6b7585}
+
+/* Pricing */
+.pricing{background:#fff}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px}
+.price-card{border:1px solid var(--line);border-radius:20px;padding:28px;display:flex;flex-direction:column;min-height:470px}.price-card.featured{border:2px solid var(--indigo);box-shadow:0 20px 50px rgba(95,99,234,.12);transform:translateY(-8px)}.price-label{font-size:11px;text-transform:uppercase;letter-spacing:.13em;font-weight:900;color:var(--indigo)}.price-card h3{font-size:25px;margin:12px 0 0}.price-main{font-family:"Manrope";font-size:34px;font-weight:800;letter-spacing:-.04em;margin-top:24px}.price-sub{font-size:13px;color:var(--muted);min-height:24px}.price-card p{color:var(--muted);font-size:14px}.price-card ul{list-style:none;margin:20px 0 26px;padding:0;display:grid;gap:11px}.price-card li{font-size:13px;display:flex;gap:9px}.price-card li:before{content:"•";color:var(--indigo);font-weight:900}.price-card .btn{margin-top:auto}.pricing-note{font-size:12px;color:var(--muted);margin-top:20px}
+
+/* About */
+.about{background:var(--soft)}
+.about-layout{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:start}.about-copy p{font-size:17px;color:var(--muted);margin:0 0 18px}.principles{display:grid;gap:12px}.principle{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px}.principle strong{display:block;margin-bottom:4px}.principle span{color:var(--muted);font-size:13px}
+.stack-line{margin-top:28px;padding-top:26px;border-top:1px solid var(--line)}.stack-line small{display:block;font-weight:800;color:#5c6677;text-transform:uppercase;letter-spacing:.12em;font-size:10px;margin-bottom:14px}.stack-chips{display:flex;flex-wrap:wrap;gap:8px}.stack-chips span{padding:8px 11px;border:1px solid #d7dde5;background:#fff;border-radius:999px;font-size:12px;color:#3b4759}
+
+/* FAQ */
+.faq-wrap{max-width:900px}.faq-item{border-bottom:1px solid var(--line)}.faq-q{width:100%;display:flex;justify-content:space-between;gap:20px;align-items:center;text-align:left;background:transparent;border:0;padding:22px 0;cursor:pointer;color:var(--ink);font-weight:800;font-size:17px}.faq-q span:last-child{font-size:25px;font-weight:400;color:var(--indigo);transition:.2s}.faq-q[aria-expanded="true"] span:last-child{transform:rotate(45deg)}.faq-a{display:none;padding:0 0 22px;color:var(--muted);font-size:15px}.faq-a.open{display:block}
+
+/* CTA */
+.cta-section{padding:0 0 88px}.cta-box{background:var(--navy);color:#fff;border-radius:26px;padding:52px;display:grid;grid-template-columns:1.25fr .75fr;gap:40px;align-items:center;position:relative;overflow:hidden}.cta-box:after{content:"";position:absolute;width:330px;height:330px;border:1px solid rgba(255,255,255,.1);border-radius:50%;right:-150px;top:-100px}.cta-box .kicker{color:#aab7ff}.cta-box h2{font-family:"Manrope";font-size:clamp(34px,4vw,54px);letter-spacing:-.04em;line-height:1.06;margin:0}.cta-box p{color:#bdc7d6;max-width:690px}.cta-actions{position:relative;z-index:2;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+
+/* Footer */
+.site-footer{background:#050d19;color:#fff;padding:58px 0 28px}.footer-grid{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:50px}.footer-brand p{color:#aab5c5;font-size:13px;max-width:330px}.footer-col strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:#8592a6;margin-bottom:15px}.footer-col a{display:block;color:#d3dbea;font-size:13px;margin:9px 0}.footer-col a:hover{color:#fff}.footer-bottom{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:45px;padding-top:24px;border-top:1px solid rgba(255,255,255,.1);color:#8290a4;font-size:11px}
+
+/* Responsive */
+@media(max-width:1100px){
+  .nav-desktop{display:none}.header-actions .header-cta{display:none}.menu-btn{display:flex}
+  .hero-grid{grid-template-columns:1fr;gap:42px}.ops-visual{min-height:auto}.trust-grid{grid-template-columns:1fr 1fr}.trust-cell:nth-child(2){border-right:0}.trust-cell:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .solution-grid,.industry-grid,.pricing-grid{grid-template-columns:1fr 1fr}.price-card.featured{transform:none}
+  .system-layout{grid-template-columns:1fr}.system-sticky{position:static}.about-layout{grid-template-columns:1fr 1fr;gap:40px}
+}
+@media(max-width:760px){
+  .container{width:min(100% - 32px,var(--max))}.section{padding:78px 0}.header-inner{height:74px}.mobile-drawer{inset:74px 0 0 0}
+  .brand{font-size:15px}.brand img{width:34px;height:34px}.lang-switch{display:none}
+  .hero{padding:60px 0 38px}.hero h1{font-size:clamp(42px,13vw,64px)}.hero-copy{font-size:17px}.hero-actions .btn{width:100%}.hero-meta{gap:12px;flex-direction:column}
+  .ops-visual{padding:20px;border-radius:20px}.flow-map{grid-template-columns:1fr}.flow-card.emphasis{grid-column:auto;grid-template-columns:1fr auto}.signal-list{grid-template-columns:1fr}
+  .trust-grid{grid-template-columns:1fr}.trust-cell{border-right:0;border-bottom:1px solid var(--line)}.trust-cell:last-child{border-bottom:0}.trust-cell b{font-size:24px}
+  .section-head{display:block}.section-head .section-lead{margin-top:12px}.solution-grid,.industry-grid,.pricing-grid{grid-template-columns:1fr}.solution-card{min-height:250px}.solution-icon{margin-bottom:32px}
+  .system-layout{gap:34px}.process-step{grid-template-columns:46px 1fr;padding:20px}.process-no{width:40px;height:40px}
+  .industry-card{min-height:280px}.governance-grid,.pilot-layout,.about-layout{grid-template-columns:1fr}.metric-grid{grid-template-columns:1fr}.price-card{min-height:auto}
+  .cta-box{grid-template-columns:1fr;padding:34px 24px}.cta-actions{justify-content:flex-start}.cta-actions .btn{width:100%}
+  .footer-grid{grid-template-columns:1fr 1fr}.footer-brand{grid-column:1/-1}
+}
+@media(max-width:520px){.footer-grid{grid-template-columns:1fr}.footer-brand{grid-column:auto}.section-title{font-size:38px}.mobile-panel{width:100%}.header-actions{gap:7px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
+
+
+/* Standalone/mobile-safe layer */
+.lang-page[hidden]{display:none!important}
+html{background:#fff}
+body{min-width:0}
+img{max-width:100%}
+@media (max-width: 900px){
+  .mobile-drawer{display:none}
+  .mobile-drawer.open{display:block}
+}
+</style>
+</head>
+<body>
+  <div class="lang-page" data-lang-page="es">
+    
+<a class="skip-link" href="#main">Saltar al contenido</a>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="#top" aria-label="VENLIORA inicio"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIj4KICA8dGl0bGU+VmVubGlvcmEgbWFyazwvdGl0bGU+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9IiMwQjFFM0IiLz4KICA8cGF0aCBkPSJNMTUgMThoOWw4IDI0IDgtMjRoOUwzNyA0OUgyN0wxNSAxOFoiIGZpbGw9IiNGRkZGRkYiLz4KICA8cGF0aCBkPSJNNDIgMThoN2wtOCAyMmgtN2w4LTIyWiIgZmlsbD0iIzZGN0JGRiIgb3BhY2l0eT0iLjk1Ii8+Cjwvc3ZnPgo=" alt=""><span>VENLIORA</span></a>
+    <nav class="nav-desktop" aria-label="Navegación principal">
+      <div class="nav-item">
+        <button class="nav-link" type="button">Soluciones <svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="m3 6 5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
+        <div class="mega" role="menu">
+          <div class="mega-grid">
+            <a href="#solutions"><strong>Commercial Operations</strong><span>Captación, CRM y seguimiento comercial.</span></a>
+            <a href="#solutions"><strong>Client Operations</strong><span>Propuestas, onboarding y coordinación.</span></a>
+            <a href="#solutions"><strong>Revenue Operations</strong><span>CxC, pagos, conciliación y alertas.</span></a>
+            <a href="#governance"><strong>AI Governance</strong><span>Automatización con controles humanos.</span></a>
+          </div>
+        </div>
+      </div>
+      <div class="nav-item"><a class="nav-link" href="#industries">Sectores</a></div>
+      <div class="nav-item"><a class="nav-link" href="#method">Cómo trabajamos</a></div>
+      <div class="nav-item"><a class="nav-link" href="#about">Nosotros</a></div>
+      <div class="nav-item"><a class="nav-link" href="#pricing">Planes</a></div>
+      <div class="nav-item"><a class="nav-link" href="#contact">Contacto</a></div>
+    </nav>
+    <div class="header-actions">
+      <div class="lang-switch" aria-label="Idioma"><a href="#" data-switch-lang="es" aria-current="page">ES</a><a href="#" data-switch-lang="en">EN</a></div>
+      <a class="btn btn-primary header-cta" href="https://calendly.com/venlioraoffice/diagnostico-venliora-20-min" target="_blank" rel="noopener">Agendar diagnóstico</a>
+      <button class="menu-btn" type="button" aria-label="Abrir menú" aria-expanded="false"><span></span></button>
+    </div>
+  </div>
+</header>
+<div class="mobile-drawer" aria-hidden="true">
+  <div class="mobile-panel">
+    <div class="mobile-row"><button class="mobile-accordion" type="button" aria-expanded="false" aria-controls="mobile-solutions">Soluciones <span>＋</span></button><div id="mobile-solutions" class="mobile-submenu"><a href="#solutions">Commercial Operations</a><a href="#solutions">Client Operations</a><a href="#solutions">Revenue Operations</a><a href="#governance">AI Governance</a></div></div>
+    <div class="mobile-row"><a href="#industries">Sectores <span>›</span></a></div>
+    <div class="mobile-row"><a href="#method">Cómo trabajamos <span>›</span></a></div>
+    <div class="mobile-row"><a href="#about">Nosotros <span>›</span></a></div>
+    <div class="mobile-row"><a href="#pricing">Planes <span>›</span></a></div>
+    <div class="mobile-row"><a href="#contact">Contacto <span>›</span></a></div>
+    <div class="mobile-row"><a href="#" data-switch-lang="en">English <span>EN</span></a></div>
+    <div class="mobile-meta"><strong>VENLIORA</strong><br>Managed AI Operations<br>Chile · prestación remota<br><br><a href="mailto:venlioraoffice@gmail.com">venlioraoffice@gmail.com</a></div>
+  </div>
+</div>
+
+<main id="main">
+<section class="hero" id="top">
+  <div class="container hero-grid">
+    <div>
+      <div class="kicker">Managed AI Operations</div>
+      <h1 class="display">Operaciones más inteligentes. <span class="accent">Seguimiento que no se pierde.</span></h1>
+      <p class="hero-copy">Diseñamos, implementamos y operamos una capa de IA + automatización para empresas de servicios que necesitan conectar oportunidades, CRM, propuestas, onboarding, tareas, pagos y reporting sin depender de trabajo manual disperso.</p>
+      <div class="hero-actions"><a class="btn btn-primary" href="https://calendly.com/venlioraoffice/diagnostico-venliora-20-min" target="_blank" rel="noopener">Diagnóstico de 20 min <svg class="icon-arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a><a class="btn btn-ghost" href="#solutions">Explorar soluciones</a></div>
+      <div class="hero-meta"><span><i></i>Prestación remota desde Chile</span><span><i></i>Integra herramientas existentes</span><span><i></i>Control humano en decisiones sensibles</span></div>
+    </div>
+    <div class="ops-visual" aria-label="Representación del sistema operativo Venliora">
+      <div class="visual-top"><span class="visual-title">Operations Control Layer</span><span class="visual-status">System ready</span></div>
+      <div class="flow-map">
+        <div class="flow-card"><small><i></i>Entrada</small><h3>Lead & Intake</h3><p>Web, email, agenda, formularios y referidos.</p></div>
+        <div class="flow-card"><small><i></i>Comercial</small><h3>CRM & Follow-up</h3><p>Prioridad, próximos pasos y oportunidades estancadas.</p></div>
+        <div class="flow-card"><small><i></i>Cliente</small><h3>Proposal & Onboarding</h3><p>Alcance, aprobaciones, datos, accesos y checklist.</p></div>
+        <div class="flow-card"><small><i></i>Finanzas</small><h3>Revenue Ops</h3><p>Cuentas por cobrar, pagos, mora y conciliación.</p></div>
+        <div class="flow-card emphasis"><div><small><i></i>Reporting</small><h3>Una operación trazable de punta a punta</h3><p>El sistema detecta pendientes y escala decisiones cuando corresponde.</p></div><div class="score">8</div></div>
+      </div>
+      <div class="signal-row"><strong>Señales operativas</strong><div class="signal-list"><div class="signal">Seguimiento pendiente</div><div class="signal">Handoff sin dueño</div><div class="signal">Pago por conciliar</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="trust-strip" aria-label="Datos del servicio">
+  <div class="container trust-grid"><div class="trust-cell trust-intro">Arquitectura pensada para validar valor antes de escalar infraestructura.</div><div class="trust-cell"><b>20 min</b><span>diagnóstico inicial</span></div><div class="trust-cell"><b>8 etapas</b><span>del lead al reporting</span></div><div class="trust-cell"><b>100%</b><span>prestación remota</span></div></div>
+</section>
+
+<section class="section solutions" id="solutions">
+  <div class="container">
+    <div class="section-head"><div><div class="kicker">Soluciones</div><h2 class="section-title">Una capa operativa, no una colección de automatizaciones sueltas.</h2></div><p class="section-lead">Partimos desde el proceso que hoy genera más fricción comercial u operativa y conectamos lo necesario sin reemplazar herramientas que ya funcionan.</p></div>
+    <div class="solution-grid">
+      <article class="solution-card"><div class="solution-icon"><svg viewBox="0 0 28 28"><path d="M5 7h18M5 14h12M5 21h8"/><circle cx="21" cy="20" r="3"/></svg></div><h3>Lead & Follow-up</h3><p>Captura, calificación, prioridad, responsable, próxima acción y seguimiento para que las oportunidades no se enfríen.</p><a href="#contact">Ver aplicación <span>→</span></a></article>
+      <article class="solution-card"><div class="solution-icon"><svg viewBox="0 0 28 28"><rect x="4" y="5" width="20" height="18" rx="3"/><path d="M9 10h10M9 15h10M9 20h6"/></svg></div><h3>CRM Operations</h3><p>Pipeline, estados, notas, tareas, alertas y handoffs con una fuente de verdad operativa que el equipo pueda mantener.</p><a href="#contact">Ver aplicación <span>→</span></a></article>
+      <article class="solution-card"><div class="solution-icon"><svg viewBox="0 0 28 28"><path d="M7 4h10l4 4v16H7z"/><path d="M17 4v5h5M10 14h8M10 18h8"/></svg></div><h3>Proposal & Onboarding</h3><p>Borradores, aprobaciones, formularios, accesos, documentos y checklists para pasar de venta a entrega con menos fricción.</p><a href="#contact">Ver aplicación <span>→</span></a></article>
+      <article class="solution-card"><div class="solution-icon"><svg viewBox="0 0 28 28"><path d="M4 20h5l3-8 4 11 3-7h5"/></svg></div><h3>Delivery Operations</h3><p>Distribución de tareas, responsables, bloqueos, entregables y alertas para coordinar la ejecución sin depender de memoria manual.</p><a href="#contact">Ver aplicación <span>→</span></a></article>
+      <article class="solution-card"><div class="solution-icon"><svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="9"/><path d="M9 14h10M14 9v10"/></svg></div><h3>Revenue Operations</h3><p>Cuentas por cobrar, pagos, conciliación, mora y señales financieras conectadas con el cliente y la operación.</p><a href="#contact">Ver aplicación <span>→</span></a></article>
+      <article class="solution-card"><div class="solution-icon"><svg viewBox="0 0 28 28"><path d="M5 22V13M11 22V7M17 22v-5M23 22V4"/></svg></div><h3>Reporting & Signals</h3><p>Resúmenes ejecutivos, cuellos de botella, oportunidades estancadas y datos útiles para decidir qué corregir primero.</p><a href="#contact">Ver aplicación <span>→</span></a></article>
+    </div>
+  </div>
+</section>
+
+<section class="section system" id="method">
+  <div class="container system-layout">
+    <div class="system-sticky"><div class="kicker">Cómo trabajamos</div><h2 class="section-title">Del diagnóstico a una operación gestionada.</h2><p class="section-lead">La automatización se implementa con alcance, responsables, reglas y puntos de control. Primero se valida; después se amplía.</p></div>
+    <div class="process">
+      <article class="process-step"><div class="process-no">01</div><div><h3>Diagnóstico operativo</h3><p>Mapeamos el flujo, herramientas, tareas repetitivas, fugas y decisiones que deben permanecer bajo <strong>control humano</strong>.</p></div></article>
+      <article class="process-step"><div class="process-no">02</div><div><h3>Diseño del sistema</h3><p>Definimos entradas, reglas, responsables, integraciones, alertas, datos mínimos y criterio de éxito.</p></div></article>
+      <article class="process-step"><div class="process-no">03</div><div><h3>Implementación & prueba</h3><p>Conectamos el stack necesario, probamos con datos controlados y documentamos el funcionamiento.</p></div></article>
+      <article class="process-step"><div class="process-no">04</div><div><h3>Operación & mejora</h3><p>Monitoreamos, corregimos fricción y ampliamos solo cuando el flujo ya demuestra utilidad operativa.</p></div></article>
+    </div>
+  </div>
+</section>
+
+<section class="section industries" id="industries">
+  <div class="container"><div class="kicker">Sectores</div><h2 class="section-title">Especialmente útil donde ventas y operación dependen de muchos handoffs.</h2><p class="section-lead">Estas categorías describen dónde el modelo encaja mejor; no implican clientes, alianzas ni certificaciones en esos sectores.</p>
+    <div class="industry-grid">
+      <article class="industry-card"><div class="industry-content"><small>01 · Validación inicial</small><h3>Capacitación B2B & OTEC</h3><p>Solicitudes, cotizaciones, coordinación, documentación y seguimiento.</p></div></article>
+      <article class="industry-card"><div class="industry-content"><small>02</small><h3>Consultoría</h3><p>Pipeline, propuestas, entregables, seguimiento y coordinación interna.</p></div></article>
+      <article class="industry-card"><div class="industry-content"><small>03</small><h3>Servicios profesionales</h3><p>Intake, gestión de oportunidades, onboarding y control de pendientes.</p></div></article>
+      <article class="industry-card"><div class="industry-content"><small>04</small><h3>Agencias B2B</h3><p>Leads, handoffs comerciales, producción, aprobaciones y reporting.</p></div></article>
+      <article class="industry-card"><div class="industry-content"><small>05</small><h3>Servicios técnicos</h3><p>Solicitudes, agenda, asignación, estados, evidencias y facturación.</p></div></article>
+      <article class="industry-card"><div class="industry-content"><small>06</small><h3>Equipos inmobiliarios</h3><p>Consultas, seguimiento, agenda, documentación y coordinación comercial.</p></div></article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="governance">
+  <div class="container"><div class="kicker">Gobernanza operativa</div><h2 class="section-title">Automatizar más no significa perder control.</h2><p class="section-lead">Las decisiones sensibles se separan de las tareas repetitivas. El sistema acelera la operación y deja trazabilidad; la persona conserva autoridad donde importa.</p>
+    <div class="governance-grid"><article class="governance-card highlight"><h3>La IA puede ejecutar</h3><p>Tareas previamente definidas, reversibles y de bajo riesgo operativo.</p><ul class="rule-list"><li>Clasificar y registrar información</li><li>Preparar borradores y resúmenes</li><li>Detectar pendientes y disparar alertas</li><li>Actualizar estados y reportes</li></ul></article><article class="governance-card"><h3>Una persona aprueba</h3><p>Acciones con impacto económico, contractual, reputacional o excepcional.</p><ul class="rule-list"><li>Descuentos y condiciones especiales</li><li>Contratos y compromisos relevantes</li><li>Reembolsos y movimientos de dinero</li><li>Excepciones fuera de reglas predefinidas</li></ul></article></div>
+  </div>
+</section>
+
+<section class="section pilot">
+  <div class="container pilot-layout"><div><div class="kicker">Proof before scale</div><h2 class="section-title">El piloto existe para demostrar utilidad antes de escalar.</h2><p class="section-lead">No prometemos ahorros abstractos. Definimos una métrica antes, automatizamos un flujo concreto y comparamos el resultado después.</p></div><div class="metric-panel"><h3>Qué medimos en un Pilot Ops Sprint</h3><p>Los indicadores dependen del proceso elegido. Ejemplos:</p><div class="metric-grid"><div class="metric"><small>Tiempo</small><strong>Horas manuales por semana</strong></div><div class="metric"><small>Seguimiento</small><strong>Pendientes sin próximo paso</strong></div><div class="metric"><small>Velocidad</small><strong>Tiempo de respuesta</strong></div><div class="metric"><small>Control</small><strong>Errores / duplicaciones</strong></div></div><div class="pilot-note">*No se muestran resultados de clientes porque VENLIORA está en etapa de validación comercial y no inventamos casos de éxito.</div></div></div>
+</section>
+
+<section class="section pricing" id="pricing">
+  <div class="container"><div class="kicker">Oferta comercial</div><h2 class="section-title">Empieza con un flujo. Escala cuando el sistema pruebe valor.</h2><p class="section-lead">Precios de lanzamiento vigentes para Chile. El alcance final se confirma por escrito antes de implementar.</p>
+    <div class="pricing-grid">
+      <article class="price-card"><span class="price-label">Piloto</span><h3>Pilot Ops Sprint</h3><div class="price-main">CLP $390.000</div><div class="price-sub">pago único</div><p>Diagnóstico, automatización y puesta en operación de un flujo concreto.</p><ul><li>1 flujo prioritario</li><li>Integración y configuración</li><li>Prueba funcional</li><li>Documentación básica</li></ul><a class="btn btn-ghost" href="https://calendly.com/venlioraoffice/diagnostico-venliora-20-min" target="_blank" rel="noopener">Evaluar piloto</a></article>
+      <article class="price-card featured"><span class="price-label">Operación continua</span><h3>Managed Ops Core</h3><div class="price-main">CLP $750.000</div><div class="price-sub">setup + CLP $590.000/mes</div><p>Para mantener seguimiento, CRM, handoffs y tareas críticas funcionando.</p><ul><li>Automatizaciones gestionadas</li><li>Monitoreo y ajustes</li><li>Control operativo</li><li>Reportes periódicos</li></ul><a class="btn btn-indigo" href="https://calendly.com/venlioraoffice/diagnostico-venliora-20-min" target="_blank" rel="noopener">Conversar sobre Core</a></article>
+      <article class="price-card"><span class="price-label">Mayor complejidad</span><h3>Managed Ops Growth</h3><div class="price-main">CLP $1.400.000</div><div class="price-sub">setup + CLP $990.000/mes</div><p>Para mayor volumen, múltiples flujos y coordinación entre áreas.</p><ul><li>Más flujos e integraciones</li><li>Automatización avanzada</li><li>Mayor cobertura operativa</li><li>Optimización continua</li></ul><a class="btn btn-ghost" href="https://calendly.com/venlioraoffice/diagnostico-venliora-20-min" target="_blank" rel="noopener">Conversar sobre Growth</a></article>
+    </div><div class="pricing-note">VENLIORA no garantiza resultados financieros. Los resultados dependen del proceso, datos, volumen, herramientas y adopción de cada empresa.</div>
+  </div>
+</section>
+
+<section class="section about" id="about">
+  <div class="container about-layout"><div><div class="kicker">Nosotros</div><h2 class="section-title">Construida en Chile para operar empresas de servicios con menos fricción manual.</h2><div class="about-copy"><p>VENLIORA es una empresa de Managed AI Operations en etapa de validación comercial. Nuestro foco no es vender tecnología por sí sola, sino convertir procesos dispersos en sistemas operativos claros, medibles y mantenibles.</p><p>Trabajamos con una regla simple: reutilizar lo que ya sirve, automatizar lo repetitivo y escalar solo cuando exista una razón comercial concreta.</p></div><div class="stack-line"><small>Diseñada para integrarse con</small><div class="stack-chips"><span>Google Workspace</span><span>Make</span><span>Calendly</span><span>CRM / Sheets</span><span>Email</span><span>Formularios</span><span>Pasarelas de pago</span><span>APIs / Webhooks</span></div></div></div><div class="principles"><div class="principle"><strong>01 · Primero el proceso</strong><span>No automatizamos un problema mal definido.</span></div><div class="principle"><strong>02 · Control humano</strong><span>Las decisiones sensibles no se delegan ciegamente a IA.</span></div><div class="principle"><strong>03 · Trazabilidad</strong><span>Cada flujo debe tener estado, responsable, próximo paso y registro.</span></div><div class="principle"><strong>04 · Valor antes de escala</strong><span>El piloto debe producir evidencia antes de ampliar la infraestructura.</span></div></div></div>
+</section>
+
+<section class="section" id="faq">
+  <div class="container"><div class="kicker">Preguntas frecuentes</div><h2 class="section-title">Lo importante antes de automatizar.</h2><div class="faq-wrap">
+    <div class="faq-item"><button class="faq-q" aria-expanded="false" aria-controls="a1"><span>¿Tenemos que reemplazar nuestras herramientas actuales?</span><span>＋</span></button><div class="faq-a" id="a1">No necesariamente. VENLIORA prioriza reutilizar el stack existente y conectar lo que ya funciona antes de recomendar reemplazos.</div></div>
+    <div class="faq-item"><button class="faq-q" aria-expanded="false" aria-controls="a2"><span>¿La IA toma decisiones sola?</span><span>＋</span></button><div class="faq-a" id="a2">Solo dentro de reglas previamente definidas y para tareas de bajo riesgo. Precios especiales, contratos, reembolsos, movimientos de dinero y excepciones relevantes pueden quedar sujetos a aprobación humana.</div></div>
+    <div class="faq-item"><button class="faq-q" aria-expanded="false" aria-controls="a3"><span>¿Trabajan únicamente con OTEC?</span><span>＋</span></button><div class="faq-a" id="a3">No. Las OTEC son la cohorte inicial de validación porque su fricción operativa es visible, pero el modelo está diseñado para empresas de servicios B2B en general.</div></div>
+    <div class="faq-item"><button class="faq-q" aria-expanded="false" aria-controls="a4"><span>¿Pueden trabajar fuera de Chile?</span><span>＋</span></button><div class="faq-a" id="a4">La prestación está diseñada para ser remota. La contratación, moneda, impuestos y medios de pago para proyectos internacionales deben confirmarse caso a caso.</div></div>
+    <div class="faq-item"><button class="faq-q" aria-expanded="false" aria-controls="a5"><span>¿Por qué no muestran clientes o casos de éxito?</span><span>＋</span></button><div class="faq-a" id="a5">Porque VENLIORA está en etapa de validación comercial y no presentamos como propios clientes, certificaciones o resultados que todavía no existen. Los primeros casos públicos se incorporarán cuando puedan documentarse.</div></div>
+  </div></div>
+</section>
+
+<section class="cta-section" id="contact"><div class="container"><div class="cta-box"><div><div class="kicker">Primer paso</div><h2>Identifiquemos el flujo que más seguimiento, tiempo o ingresos está dejando escapar.</h2><p>Agenda un diagnóstico de 20 minutos. Revisaremos un proceso concreto y definiremos si existe un caso razonable para un piloto.</p></div><div class="cta-actions"><a class="btn btn-light" href="https://calendly.com/venlioraoffice/diagnostico-venliora-20-min" target="_blank" rel="noopener">Agendar diagnóstico</a><a class="btn btn-ghost" style="color:#fff;border-color:#40516b" href="mailto:venlioraoffice@gmail.com?subject=Consulta%20VENLIORA">Enviar email</a></div></div></div></section>
+</main>
+
+<footer class="site-footer"><div class="container"><div class="footer-grid"><div class="footer-brand"><a class="brand" href="#top"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIj4KICA8dGl0bGU+VmVubGlvcmEgbWFyazwvdGl0bGU+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9IiMwQjFFM0IiLz4KICA8cGF0aCBkPSJNMTUgMThoOWw4IDI0IDgtMjRoOUwzNyA0OUgyN0wxNSAxOFoiIGZpbGw9IiNGRkZGRkYiLz4KICA8cGF0aCBkPSJNNDIgMThoN2wtOCAyMmgtN2w4LTIyWiIgZmlsbD0iIzZGN0JGRiIgb3BhY2l0eT0iLjk1Ii8+Cjwvc3ZnPgo=" alt=""><span>VENLIORA</span></a><p>Managed AI Operations para empresas de servicios. Prestación remota desde Chile.</p></div><div class="footer-col"><strong>Soluciones</strong><a href="#solutions">Commercial Ops</a><a href="#solutions">Client Ops</a><a href="#solutions">Revenue Ops</a><a href="#governance">AI Governance</a></div><div class="footer-col"><strong>Empresa</strong><a href="#about">Nosotros</a><a href="#method">Método</a><a href="#pricing">Planes</a><a href="#faq">FAQ</a></div><div class="footer-col"><strong>Contacto</strong><a href="mailto:venlioraoffice@gmail.com">venlioraoffice@gmail.com</a><a href="https://calendly.com/venlioraoffice/diagnostico-venliora-20-min" target="_blank" rel="noopener">Diagnóstico 20 min</a><a href="#" data-switch-lang="en">English version</a></div></div><div class="footer-bottom"><span>© 2026 VENLIORA. Marca operativa provisional pendiente de verificación registral.</span><span>Chile · Remote delivery</span></div></div></footer>
+
+
+  </div>
+
+  <div class="lang-page" data-lang-page="en" hidden>
+    
+<a class="skip-link" href="#en-main">Skip to content</a>
+<header class="site-header"><div class="container header-inner"><a class="brand" href="#en-top" aria-label="VENLIORA home"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIj4KICA8dGl0bGU+VmVubGlvcmEgbWFyazwvdGl0bGU+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9IiMwQjFFM0IiLz4KICA8cGF0aCBkPSJNMTUgMThoOWw4IDI0IDgtMjRoOUwzNyA0OUgyN0wxNSAxOFoiIGZpbGw9IiNGRkZGRkYiLz4KICA8cGF0aCBkPSJNNDIgMThoN2wtOCAyMmgtN2w4LTIyWiIgZmlsbD0iIzZGN0JGRiIgb3BhY2l0eT0iLjk1Ii8+Cjwvc3ZnPgo=" alt=""><span>VENLIORA</span></a><nav class="nav-desktop" aria-label="Main navigation"><div class="nav-item"><button class="nav-link" type="button">Solutions <svg class="chev" viewBox="0 0 16 16"><path d="m3 6 5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button><div class="mega"><div class="mega-grid"><a href="#en-solutions"><strong>Commercial Operations</strong><span>Lead capture, CRM and follow-up.</span></a><a href="#en-solutions"><strong>Client Operations</strong><span>Proposals, onboarding and coordination.</span></a><a href="#en-solutions"><strong>Revenue Operations</strong><span>AR, payments, reconciliation and alerts.</span></a><a href="#en-governance"><strong>AI Governance</strong><span>Automation with human controls.</span></a></div></div></div><div class="nav-item"><a class="nav-link" href="#en-industries">Industries</a></div><div class="nav-item"><a class="nav-link" href="#en-method">How we work</a></div><div class="nav-item"><a class="nav-link" href="#en-about">About</a></div><div class="nav-item"><a class="nav-link" href="#en-pricing">Plans</a></div><div class="nav-item"><a class="nav-link" href="#en-contact">Contact</a></div></nav><div class="header-actions"><div class="lang-switch"><a href="#" data-switch-lang="es">ES</a><a href="#" data-switch-lang="en" aria-current="page">EN</a></div><a class="btn btn-primary header-cta" href="https://calendly.com/venlioraoffice/diagnostico-venliora-20-min" target="_blank" rel="noopener">Book diagnostic</a><button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false"><span></span></button></div></div></header>
+<div class="mobile-drawer"><div class="mobile-panel"><div class="mobile-row"><button class="mobile-accordion" type="button" aria-expanded="false" aria-controls="en-mobile-solutions-en">Solutions <span>＋</span></button><div id="en-mobile-solutions-en" class="mobile-submenu"><a href="#en-solutions">Commercial Operations</a><a href="#en-solutions">Client Operations</a><a href="#en-solutions">Revenue Operations</a><a href="#en-governance">AI Governance</a></div></div><div class="mobile-row"><a href="#en-industries">Industries <span>›</span></a></div><div class="mobile-row"><a href="#en-method">How we work <span>›</span></a></div><div class="mobile-row"><a href="#en-about">About <span>›</span></a></div><div class="mobile-row"><a href="#en-pricing">Plans <span>›</span></a></div><div class="mobile-row"><a href="#en-contact">Contact <span>›</span></a></div><div class="mobile-row"><a href="#" data-switch-lang="es">Español <span>ES</span></a></div><div class="mobile-meta"><strong>VENLIORA</strong><br>Managed AI Operations<br>Chile · remote delivery<br><br><a href="mailto:venlioraoffice@gmail.com">venlioraoffice@gmail.com</a></div></div></div>
+<main id="en-main">
+<section class="hero" id="en-top"><div class="container hero-grid"><div><div class="kicker">Managed AI Operations</div><h1 class="display">Smarter operations. <span class="accent">Follow-up that does not get lost.</span></h1><p class="hero-copy">We design, implement and operate an AI + automation layer for service companies that need to connect opportunities, CRM, proposals, onboarding, tasks, payments and reporting without relying on scattered manual work.</p><div class="hero-actions"><a class="btn btn-primary" href="https://calendly.com/venlioraoffice/diagnostico-venliora-20-min" target="_blank" rel="noopener">20-minute diagnostic <svg class="icon-arrow" viewBox="0 0 20 20"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a><a class="btn btn-ghost" href="#en-solutions">Explore solutions</a></div><div class="hero-meta"><span><i></i>Remote delivery from Chile</span><span><i></i>Works with your existing stack</span><span><i></i>Human control for sensitive decisions</span></div></div><div class="ops-visual"><div class="visual-top"><span class="visual-title">Operations Control Layer</span><span class="visual-status">System ready</span></div><div class="flow-map"><div class="flow-card"><small><i></i>Input</small><h3>Lead & Intake</h3><p>Web, email, calendar, forms and referrals.</p></div><div class="flow-card"><small><i></i>Commercial</small><h3>CRM & Follow-up</h3><p>Priority, next steps and stalled opportunities.</p></div><div class="flow-card"><small><i></i>Client</small><h3>Proposal & Onboarding</h3><p>Scope, approvals, data, access and checklists.</p></div><div class="flow-card"><small><i></i>Finance</small><h3>Revenue Ops</h3><p>AR, payments, overdue items and reconciliation.</p></div><div class="flow-card emphasis"><div><small><i></i>Reporting</small><h3>One traceable operation, end to end</h3><p>The system detects pending work and escalates decisions when needed.</p></div><div class="score">8</div></div></div><div class="signal-row"><strong>Operational signals</strong><div class="signal-list"><div class="signal">Follow-up pending</div><div class="signal">Handoff unowned</div><div class="signal">Payment to reconcile</div></div></div></div></div></section>
+<section class="trust-strip"><div class="container trust-grid"><div class="trust-cell trust-intro">An architecture designed to prove value before scaling infrastructure.</div><div class="trust-cell"><b>20 min</b><span>initial diagnostic</span></div><div class="trust-cell"><b>8 stages</b><span>lead to reporting</span></div><div class="trust-cell"><b>100%</b><span>remote delivery</span></div></div></section>
+<section class="section solutions" id="en-solutions"><div class="container"><div class="section-head"><div><div class="kicker">Solutions</div><h2 class="section-title">An operating layer, not a collection of disconnected automations.</h2></div><p class="section-lead">We start with the process causing the most commercial or operational friction and connect what is needed without replacing tools that already work.</p></div><div class="solution-grid"><article class="solution-card"><div class="solution-icon"><svg viewBox="0 0 28 28"><path d="M5 7h18M5 14h12M5 21h8"/><circle cx="21" cy="20" r="3"/></svg></div><h3>Lead & Follow-up</h3><p>Capture, qualification, priority, ownership, next action and follow-up so opportunities do not go cold.</p><a href="#en-contact">Discuss use case <span>→</span></a></article><article class="solution-card"><div class="solution-icon"><svg viewBox="0 0 28 28"><rect x="4" y="5" width="20" height="18" rx="3"/><path d="M9 10h10M9 15h10M9 20h6"/></svg></div><h3>CRM Operations</h3><p>Pipeline, statuses, notes, tasks, alerts and handoffs with an operational source of truth.</p><a href="#en-contact">Discuss use case <span>→</span></a></article><article class="solution-card"><div class="solution-icon"><svg viewBox="0 0 28 28"><path d="M7 4h10l4 4v16H7z"/><path d="M17 4v5h5M10 14h8M10 18h8"/></svg></div><h3>Proposal & Onboarding</h3><p>Drafts, approvals, forms, access, documents and checklists to move from sale to delivery with less friction.</p><a href="#en-contact">Discuss use case <span>→</span></a></article><article class="solution-card"><div class="solution-icon"><svg viewBox="0 0 28 28"><path d="M4 20h5l3-8 4 11 3-7h5"/></svg></div><h3>Delivery Operations</h3><p>Task distribution, ownership, blockers, deliverables and alerts for coordinated execution.</p><a href="#en-contact">Discuss use case <span>→</span></a></article><article class="solution-card"><div class="solution-icon"><svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="9"/><path d="M9 14h10M14 9v10"/></svg></div><h3>Revenue Operations</h3><p>Accounts receivable, payments, reconciliation, overdue items and financial signals connected to client operations.</p><a href="#en-contact">Discuss use case <span>→</span></a></article><article class="solution-card"><div class="solution-icon"><svg viewBox="0 0 28 28"><path d="M5 22V13M11 22V7M17 22v-5M23 22V4"/></svg></div><h3>Reporting & Signals</h3><p>Executive summaries, bottlenecks, stalled opportunities and data that shows what to fix first.</p><a href="#en-contact">Discuss use case <span>→</span></a></article></div></div></section>
+<section class="section system" id="en-method"><div class="container system-layout"><div class="system-sticky"><div class="kicker">How we work</div><h2 class="section-title">From diagnostic to managed operations.</h2><p class="section-lead">Automation is implemented with scope, ownership, rules and control points. First we validate; then we expand.</p></div><div class="process"><article class="process-step"><div class="process-no">01</div><div><h3>Operational diagnostic</h3><p>We map the flow, tools, repetitive work, leakage and decisions that must remain under <strong>human control</strong>.</p></div></article><article class="process-step"><div class="process-no">02</div><div><h3>System design</h3><p>We define inputs, rules, ownership, integrations, alerts, minimum data and success criteria.</p></div></article><article class="process-step"><div class="process-no">03</div><div><h3>Implementation & testing</h3><p>We connect the required stack, test with controlled data and document how the system works.</p></div></article><article class="process-step"><div class="process-no">04</div><div><h3>Operations & improvement</h3><p>We monitor, remove friction and expand only after the workflow proves operational value.</p></div></article></div></div></section>
+<section class="section industries" id="en-industries"><div class="container"><div class="kicker">Industries</div><h2 class="section-title">A strong fit wherever sales and delivery depend on multiple handoffs.</h2><p class="section-lead">These categories describe where the model fits best; they do not imply clients, partnerships or certifications in those industries.</p><div class="industry-grid"><article class="industry-card"><div class="industry-content"><small>01 · Initial validation</small><h3>B2B Training</h3><p>Requests, quotations, coordination, documentation and follow-up.</p></div></article><article class="industry-card"><div class="industry-content"><small>02</small><h3>Consulting</h3><p>Pipeline, proposals, delivery, follow-up and internal coordination.</p></div></article><article class="industry-card"><div class="industry-content"><small>03</small><h3>Professional services</h3><p>Intake, opportunity management, onboarding and pending-work control.</p></div></article><article class="industry-card"><div class="industry-content"><small>04</small><h3>B2B Agencies</h3><p>Leads, commercial handoffs, production, approvals and reporting.</p></div></article><article class="industry-card"><div class="industry-content"><small>05</small><h3>Technical services</h3><p>Requests, scheduling, assignment, status, evidence and billing.</p></div></article><article class="industry-card"><div class="industry-content"><small>06</small><h3>Real estate teams</h3><p>Inquiries, follow-up, scheduling, documents and commercial coordination.</p></div></article></div></div></section>
+<section class="section" id="en-governance"><div class="container"><div class="kicker">Operational governance</div><h2 class="section-title">More automation does not mean less control.</h2><p class="section-lead">Sensitive decisions are separated from repetitive tasks. The system accelerates operations and creates traceability; people retain authority where it matters.</p><div class="governance-grid"><article class="governance-card highlight"><h3>AI can execute</h3><p>Predefined, reversible, low-risk operational work.</p><ul class="rule-list"><li>Classify and register information</li><li>Prepare drafts and summaries</li><li>Detect pending work and trigger alerts</li><li>Update statuses and reports</li></ul></article><article class="governance-card"><h3>A person approves</h3><p>Actions with financial, contractual, reputational or exceptional impact.</p><ul class="rule-list"><li>Discounts and special terms</li><li>Contracts and significant commitments</li><li>Refunds and money movement</li><li>Exceptions outside predefined rules</li></ul></article></div></div></section>
+<section class="section pilot"><div class="container pilot-layout"><div><div class="kicker">Proof before scale</div><h2 class="section-title">The pilot exists to prove usefulness before scaling.</h2><p class="section-lead">We do not promise abstract savings. We define a baseline metric, automate a concrete workflow and compare the result afterwards.</p></div><div class="metric-panel"><h3>What a Pilot Ops Sprint can measure</h3><p>Indicators depend on the workflow selected. Examples:</p><div class="metric-grid"><div class="metric"><small>Time</small><strong>Manual hours per week</strong></div><div class="metric"><small>Follow-up</small><strong>Items without next action</strong></div><div class="metric"><small>Speed</small><strong>Response time</strong></div><div class="metric"><small>Control</small><strong>Errors / duplication</strong></div></div><div class="pilot-note">*Client results are not displayed because VENLIORA is in commercial validation and we do not fabricate case studies.</div></div></div></section>
+<section class="section pricing" id="en-pricing"><div class="container"><div class="kicker">Commercial offer</div><h2 class="section-title">Start with one workflow. Scale after the system proves value.</h2><p class="section-lead">Current launch pricing for Chile. Final scope is confirmed in writing before implementation.</p><div class="pricing-grid"><article class="price-card"><span class="price-label">Pilot</span><h3>Pilot Ops Sprint</h3><div class="price-main">CLP $390,000</div><div class="price-sub">one-time</div><p>Diagnostic, automation and deployment of one concrete workflow.</p><ul><li>1 priority workflow</li><li>Integration and configuration</li><li>Functional test</li><li>Basic documentation</li></ul><a class="btn btn-ghost" href="https://calendly.com/venlioraoffice/diagnostico-venliora-20-min" target="_blank" rel="noopener">Evaluate pilot</a></article><article class="price-card featured"><span class="price-label">Managed operations</span><h3>Managed Ops Core</h3><div class="price-main">CLP $750,000</div><div class="price-sub">setup + CLP $590,000/month</div><p>For ongoing CRM, follow-up, handoffs and critical operational work.</p><ul><li>Managed automations</li><li>Monitoring and adjustments</li><li>Operational control</li><li>Periodic reporting</li></ul><a class="btn btn-indigo" href="https://calendly.com/venlioraoffice/diagnostico-venliora-20-min" target="_blank" rel="noopener">Discuss Core</a></article><article class="price-card"><span class="price-label">Higher complexity</span><h3>Managed Ops Growth</h3><div class="price-main">CLP $1,400,000</div><div class="price-sub">setup + CLP $990,000/month</div><p>For greater volume, multiple workflows and cross-team coordination.</p><ul><li>More workflows and integrations</li><li>Advanced automation</li><li>Broader operational coverage</li><li>Continuous optimization</li></ul><a class="btn btn-ghost" href="https://calendly.com/venlioraoffice/diagnostico-venliora-20-min" target="_blank" rel="noopener">Discuss Growth</a></article></div><div class="pricing-note">VENLIORA does not guarantee financial results. Outcomes depend on process, data, volume, tooling and adoption.</div></div></section>
+<section class="section about" id="en-about"><div class="container about-layout"><div><div class="kicker">About</div><h2 class="section-title">Built in Chile to run service operations with less manual friction.</h2><div class="about-copy"><p>VENLIORA is a Managed AI Operations company in commercial validation. Our focus is not technology for its own sake, but turning fragmented processes into clear, measurable and maintainable operating systems.</p><p>Our rule is simple: reuse what already works, automate repetitive work and scale only when there is a concrete commercial reason.</p></div><div class="stack-line"><small>Designed to integrate with</small><div class="stack-chips"><span>Google Workspace</span><span>Make</span><span>Calendly</span><span>CRM / Sheets</span><span>Email</span><span>Forms</span><span>Payment providers</span><span>APIs / Webhooks</span></div></div></div><div class="principles"><div class="principle"><strong>01 · Process first</strong><span>We do not automate a poorly defined problem.</span></div><div class="principle"><strong>02 · Human control</strong><span>Sensitive decisions are not blindly delegated to AI.</span></div><div class="principle"><strong>03 · Traceability</strong><span>Every workflow needs status, ownership, next action and a record.</span></div><div class="principle"><strong>04 · Value before scale</strong><span>The pilot should produce evidence before infrastructure expands.</span></div></div></div></section>
+<section class="section" id="en-faq"><div class="container"><div class="kicker">FAQ</div><h2 class="section-title">What matters before automating.</h2><div class="faq-wrap"><div class="faq-item"><button class="faq-q" aria-expanded="false" aria-controls="en-e1"><span>Do we need to replace our current tools?</span><span>＋</span></button><div class="faq-a" id="en-e1">Not necessarily. VENLIORA prioritizes your existing stack and connects what already works before recommending replacements.</div></div><div class="faq-item"><button class="faq-q" aria-expanded="false" aria-controls="en-e2"><span>Does AI make decisions on its own?</span><span>＋</span></button><div class="faq-a" id="en-e2">Only within predefined rules and for low-risk work. Special pricing, contracts, refunds, money movement and material exceptions can remain subject to human approval.</div></div><div class="faq-item"><button class="faq-q" aria-expanded="false" aria-controls="en-e3"><span>Do you only work with training companies?</span><span>＋</span></button><div class="faq-a" id="en-e3">No. B2B training providers are the initial validation cohort because operational friction is easy to identify, but the model is designed for service companies more broadly.</div></div><div class="faq-item"><button class="faq-q" aria-expanded="false" aria-controls="en-e4"><span>Can you work outside Chile?</span><span>＋</span></button><div class="faq-a" id="en-e4">Delivery is designed to be remote. Contracting, currency, tax treatment and payment methods for international projects are confirmed case by case.</div></div><div class="faq-item"><button class="faq-q" aria-expanded="false" aria-controls="en-e5"><span>Why are there no client logos or case studies?</span><span>＋</span></button><div class="faq-a" id="en-e5">Because VENLIORA is in commercial validation and we do not present clients, certifications or outcomes that do not yet exist. Public case studies will be added when they can be documented.</div></div></div></div></section>
+<section class="cta-section" id="en-contact"><div class="container"><div class="cta-box"><div><div class="kicker">First step</div><h2>Find the workflow leaking the most follow-up, time or revenue.</h2><p>Book a 20-minute diagnostic. We will review one concrete process and determine whether there is a reasonable case for a pilot.</p></div><div class="cta-actions"><a class="btn btn-light" href="https://calendly.com/venlioraoffice/diagnostico-venliora-20-min" target="_blank" rel="noopener">Book diagnostic</a><a class="btn btn-ghost" style="color:#fff;border-color:#40516b" href="mailto:venlioraoffice@gmail.com?subject=VENLIORA%20inquiry">Send email</a></div></div></div></section>
+</main>
+<footer class="site-footer"><div class="container"><div class="footer-grid"><div class="footer-brand"><a class="brand" href="#en-top"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIj4KICA8dGl0bGU+VmVubGlvcmEgbWFyazwvdGl0bGU+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9IiMwQjFFM0IiLz4KICA8cGF0aCBkPSJNMTUgMThoOWw4IDI0IDgtMjRoOUwzNyA0OUgyN0wxNSAxOFoiIGZpbGw9IiNGRkZGRkYiLz4KICA8cGF0aCBkPSJNNDIgMThoN2wtOCAyMmgtN2w4LTIyWiIgZmlsbD0iIzZGN0JGRiIgb3BhY2l0eT0iLjk1Ii8+Cjwvc3ZnPgo=" alt=""><span>VENLIORA</span></a><p>Managed AI Operations for service companies. Remote delivery from Chile.</p></div><div class="footer-col"><strong>Solutions</strong><a href="#en-solutions">Commercial Ops</a><a href="#en-solutions">Client Ops</a><a href="#en-solutions">Revenue Ops</a><a href="#en-governance">AI Governance</a></div><div class="footer-col"><strong>Company</strong><a href="#en-about">About</a><a href="#en-method">Method</a><a href="#en-pricing">Plans</a><a href="#en-faq">FAQ</a></div><div class="footer-col"><strong>Contact</strong><a href="mailto:venlioraoffice@gmail.com">venlioraoffice@gmail.com</a><a href="https://calendly.com/venlioraoffice/diagnostico-venliora-20-min" target="_blank" rel="noopener">20-min diagnostic</a><a href="#" data-switch-lang="es">Versión en español</a></div></div><div class="footer-bottom"><span>© 2026 VENLIORA. Provisional operating brand pending trademark verification.</span><span>Chile · Remote delivery</span></div></div></footer>
+  </div>
+
+  <script>
+(() => {
+  const pages = Array.from(document.querySelectorAll('.lang-page'));
+
+  function setupPage(page) {
+    const menuBtn = page.querySelector('.menu-btn');
+    const drawer = page.querySelector('.mobile-drawer');
+
+    const closeDrawer = () => {
+      if (!drawer || !menuBtn) return;
+      drawer.classList.remove('open');
+      drawer.setAttribute('aria-hidden','true');
+      menuBtn.setAttribute('aria-expanded','false');
+      document.body.style.overflow = '';
+    };
+
+    if (menuBtn && drawer) {
+      menuBtn.addEventListener('click', () => {
+        const open = menuBtn.getAttribute('aria-expanded') === 'true';
+        menuBtn.setAttribute('aria-expanded', String(!open));
+        drawer.classList.toggle('open', !open);
+        drawer.setAttribute('aria-hidden', open ? 'true' : 'false');
+        document.body.style.overflow = open ? '' : 'hidden';
+      });
+
+      drawer.addEventListener('click', (e) => {
+        if (e.target === drawer) closeDrawer();
+      });
+
+      drawer.querySelectorAll('a').forEach(a => {
+        if (!a.hasAttribute('data-switch-lang')) {
+          a.addEventListener('click', closeDrawer);
+        }
+      });
+    }
+
+    page.querySelectorAll('.mobile-accordion').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = document.getElementById(btn.getAttribute('aria-controls'));
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!expanded));
+        target?.classList.toggle('open', !expanded);
+      });
+    });
+
+    page.querySelectorAll('.faq-q').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = document.getElementById(btn.getAttribute('aria-controls'));
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!expanded));
+        target?.classList.toggle('open', !expanded);
+      });
+    });
+
+    page.querySelectorAll('[data-switch-lang]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchLanguage(link.getAttribute('data-switch-lang'));
+      });
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeDrawer();
+    });
+  }
+
+  function switchLanguage(lang) {
+    pages.forEach(page => {
+      const show = page.dataset.langPage === lang;
+      page.hidden = !show;
+      if (!show) {
+        page.querySelector('.mobile-drawer')?.classList.remove('open');
+        page.querySelector('.menu-btn')?.setAttribute('aria-expanded','false');
+      }
+    });
+    document.documentElement.lang = lang === 'en' ? 'en' : 'es';
+    document.title = lang === 'en'
+      ? 'VENLIORA | Managed AI Operations'
+      : 'VENLIORA | Managed AI Operations para empresas de servicios';
+    document.body.style.overflow = '';
+    window.scrollTo({top:0, behavior:'instant'});
+  }
+
+  pages.forEach(setupPage);
+})();
+</script>
+</body>
+</html>
