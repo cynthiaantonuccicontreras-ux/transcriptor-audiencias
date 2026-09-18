@@ -1,0 +1,5 @@
+[build]
+  publish = "venliora-site"
+
+[build.environment]
+  NODE_VERSION = "20"
