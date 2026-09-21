@@ -194,6 +194,18 @@ img,svg{display:block;max-width:100%}
 .site-footer{background:#050d19;color:#fff;padding:58px 0 28px}.footer-grid{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:50px}.footer-brand p{color:#aab5c5;font-size:13px;max-width:330px}.footer-col strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:#8592a6;margin-bottom:15px}.footer-col a{display:block;color:#d3dbea;font-size:13px;margin:9px 0}.footer-col a:hover{color:#fff}.footer-bottom{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:45px;padding-top:24px;border-top:1px solid rgba(255,255,255,.1);color:#8290a4;font-size:11px}
 
 
+/* VENLIORA lead form */
+.lead-form{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:28px;max-width:880px}
+.lead-form .full{grid-column:1/-1}
+.lead-form label{display:grid;gap:7px;font-size:13px;font-weight:800;color:var(--navy)}
+.lead-form input,.lead-form textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:13px 14px;background:#fff;color:var(--ink);outline:none}
+.lead-form input:focus,.lead-form textarea:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(95,99,234,.12)}
+.lead-form textarea{min-height:110px;resize:vertical}
+.lead-form .hp{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
+.form-status{min-height:24px;font-size:13px;font-weight:700;margin-top:10px}
+.form-status.ok{color:var(--success)}.form-status.err{color:#b42318}
+@media(max-width:720px){.lead-form{grid-template-columns:1fr}.lead-form .full{grid-column:auto}}
+
 /* Pre-launch conversion layer */
 .pain-section{background:#fff}
 .pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
@@ -563,6 +575,49 @@ img{max-width:100%}
     document.body.style.overflow = '';
     window.scrollTo({top:0, behavior:'instant'});
   }
+
+  const LEAD_WEBHOOK = 'https://hook.us2.make.com/qe7f9mzf1tg6xclwsqptvxps2a78trpk';
+  const leadForm = document.getElementById('leadForm');
+  const leadStatus = document.getElementById('leadStatus');
+  const leadSubmit = document.getElementById('leadSubmit');
+  leadForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!leadForm.reportValidity()) return;
+    const fd = new FormData(leadForm);
+    if (String(fd.get('website_check') || '').trim()) return;
+    const payload = {
+      empresa: String(fd.get('empresa') || '').trim(),
+      contacto: String(fd.get('contacto') || '').trim(),
+      email: String(fd.get('email') || '').trim(),
+      sitio_web: String(fd.get('sitio_web') || '').trim(),
+      dolor_observado: String(fd.get('dolor_observado') || '').trim(),
+      pais: 'Chile',
+      fuente: 'Web venliora.com',
+      canal_inicial: 'Formulario web',
+      estado: 'Solicitud recibida',
+      fecha_creacion: new Date().toISOString(),
+      origen: 'venliora.com'
+    };
+    leadSubmit.disabled = true;
+    leadStatus.className = 'form-status full';
+    leadStatus.textContent = 'Enviando…';
+    try {
+      const res = await fetch(LEAD_WEBHOOK, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error('HTTP '+res.status);
+      leadForm.reset();
+      leadStatus.className = 'form-status full ok';
+      leadStatus.textContent = 'Recibido. VENLIORA registró tu solicitud y revisará el proceso antes del diagnóstico.';
+    } catch(err) {
+      leadStatus.className = 'form-status full err';
+      leadStatus.textContent = 'No pudimos registrar la solicitud. Escríbenos a venlioraoffice@gmail.com.';
+    } finally {
+      leadSubmit.disabled = false;
+    }
+  });
 
   const demoPlay = document.getElementById('demoPlay');
   const demoSteps = Array.from(document.querySelectorAll('[data-demo-step]'));
