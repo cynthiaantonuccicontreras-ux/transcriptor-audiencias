@@ -59,8 +59,9 @@
 <script>
 (function(){
 const webhook='https://hook.us2.make.com/qe7f9mzf1tg6xclwsqptvxps2a78trpk',form=document.getElementById('webLeadForm'),s=document.getElementById('formStatus'),btn=document.getElementById('submitLead');
+const samples={mascotas:'Peluquería canina',tapiceria:'Tapicería',salud:'Servicios profesionales'};const q=new URLSearchParams(location.search),example=samples[q.get('ejemplo')]||'';const utm=['utm_source','utm_medium','utm_campaign'].map(k=>q.get(k)||'').filter(x=>/^[\w\-\.]{1,60}$/.test(x)).join(' / ');
 form.addEventListener('submit',async e=>{e.preventDefault();if(!form.reportValidity())return;const f=new FormData(form);if(String(f.get('website_check')||'').trim())return;
-const payload={empresa:String(f.get('empresa')||'').trim(),contacto:String(f.get('contacto')||'').trim(),email:String(f.get('email')||'').trim(),sitio_web:'',dolor_observado:String(f.get('tipo')||'')+' — '+String(f.get('detalle')||'').trim(),pais:'Chile',fuente:'VENLIORA Web Local',canal_inicial:'Formulario /web/',estado:'Solicitud recibida',fecha_creacion:new Date().toISOString(),origen:'venliora.com/web/'};
+const payload={empresa:String(f.get('empresa')||'').trim(),contacto:String(f.get('contacto')||'').trim(),email:String(f.get('email')||'').trim(),sitio_web:'',dolor_observado:(example?'Interés en la muestra '+example+' — ':'')+String(f.get('tipo')||'')+' — '+String(f.get('detalle')||'').trim(),pais:'Chile',fuente:'VENLIORA Web Local'+(utm?' / '+utm:''),canal_inicial:'Formulario /web/',estado:'Solicitud recibida',fecha_creacion:new Date().toISOString(),origen:'venliora.com/web/'};
 btn.disabled=true;s.textContent='Enviando tu solicitud…';
 try{const r=await fetch(webhook,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!r.ok)throw Error('HTTP '+r.status);form.reset();s.style.color='#127657';s.textContent='¡Recibido! Registramos tu consulta y nos pondremos en contacto.';}
 catch(err){s.style.color='#b33d3d';s.textContent='No se pudo confirmar el envío. Por favor, escríbenos a venlioraoffice@gmail.com.';}finally{btn.disabled=false;}
