@@ -1,0 +1,66 @@
+name: VENLIORA static site checks
+on:
+  push:
+    branches: [venliora-deploy]
+    paths:
+      - 'venliora-site/**'
+      - 'netlify.toml'
+      - '.github/workflows/venliora-site-check.yml'
+  pull_request:
+    paths:
+      - 'venliora-site/**'
+      - 'netlify.toml'
+jobs:
+  static-site:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate VENLIORA-only static content and local links
+        run: |
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import urljoin, urlparse
+
+          BASE = Path('venliora-site')
+          required = [
+              'index.html',
+              'web/index.html',
+              'web/ejemplos/index.html',
+              'web/ejemplos/mascotas/index.html',
+              'web/ejemplos/tapiceria/index.html',
+              'web/ejemplos/salud/index.html',
+              'privacy.html',
+              '404.html',
+              'favicon.svg',
+              'robots.txt',
+              'sitemap.xml',
+          ]
+          missing = [f for f in required if not (BASE/f).is_file()]
+          assert not missing, 'Required files missing: ' + repr(missing)
+          assert 'publish = "venliora-site"' in Path('netlify.toml').read_text()
+          class Reader(HTMLParser):
+              def __init__(self): super().__init__(); self.links = []; self.main = 0
+              def handle_starttag(self, tag, attrs):
+                  values = dict(attrs)
+                  if tag == 'a' and 'href' in values: self.links.append(values['href'])
+                  if tag == 'main': self.main += 1
+          errors = []
+          for path in BASE.rglob('*.html'):
+              source = path.read_text(encoding='utf-8')
+              reader = Reader(); reader.feed(source)
+              if 'Legal Antonucci' in source: errors.append(f'{path}: other brand mentioned')
+              if reader.main < 1: errors.append(f'{path}: no main landmark')
+              relative = '/' + str(path.relative_to(BASE)).removesuffix('index.html')
+              for href in reader.links:
+                  parsed = urlparse(href)
+                  if parsed.scheme or href.startswith('//') or href.startswith('#'): continue
+                  target_path = urlparse(urljoin('https://venliora.com'+relative, href)).path
+                  if target_path.endswith('/'): target_path += 'index.html'
+                  if not (BASE / target_path.lstrip('/')).is_file():
+                      errors.append(f'{path}: unresolved local link {href}')
+          assert not errors, '\n'.join(errors)
+          print(f'VENLIORA checks passed: {len(required)} required files, local links, brand separation')
+          PY
