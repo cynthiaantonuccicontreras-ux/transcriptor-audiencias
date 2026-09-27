@@ -1,0 +1,44 @@
+name: VENLIORA production package
+on:
+  push:
+    branches: [venliora-deploy]
+    paths:
+      - 'venliora-site/**'
+      - '.github/workflows/venliora-package.yml'
+  workflow_dispatch:
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check official site contents
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile
+          root = Path("venliora-site")
+          required = ("index.html", "web/index.html", "web/ejemplos/index.html",
+                      "web/ejemplos/mascotas/index.html", "web/ejemplos/tapiceria/index.html",
+                      "web/ejemplos/salud/index.html", "privacy.html", "404.html",
+                      "favicon.svg", "robots.txt", "sitemap.xml")
+          for file in required:
+              assert (root / file).is_file(), "Missing " + file
+          files = [f for f in root.rglob("*") if f.is_file()]
+          with zipfile.ZipFile("venliora-site-ready.zip", "w", zipfile.ZIP_DEFLATED) as z:
+              for f in files:
+                  z.write(f, f.relative_to(root).as_posix())
+          with zipfile.ZipFile("venliora-site-ready.zip") as z:
+              names = set(z.namelist())
+          for file in required:
+              assert file in names, "Bad package: " + file
+          print("Ready to upload into existing Netlify project:", len(files), "site files.")
+          PY
+      - name: Export exact deploy ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: VENLIORA-web-ready-for-Netlify
+          path: venliora-site-ready.zip
+          if-no-files-found: error
+          retention-days: 30
