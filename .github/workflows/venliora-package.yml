@@ -39,6 +39,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: VENLIORA-web-ready-for-Netlify
-          path: venliora-site-ready.zip
+          path: venliora-site/
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 30
