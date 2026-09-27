@@ -1,0 +1,49 @@
+name: Publish VENLIORA to its existing Netlify site
+on:
+  push:
+    branches: [venliora-deploy]
+    paths:
+      - 'venliora-site/**'
+      - 'netlify.toml'
+      - '.github/workflows/venliora-deploy-netlify.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: venliora-production-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      NETLIFY_SITE_ID: 20d086cd-e913-4685-9fa9-1244cea3a390
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require authorization for the existing VENLIORA Netlify site
+        run: |
+          if [ -z "$NETLIFY_AUTH_TOKEN" ]; then
+            echo "::error::One-time setup required: add NETLIFY_AUTH_TOKEN to this GitHub repository's Actions secrets, or enable native Netlify continuous deployment for branch venliora-deploy. No other site or account will be created."
+            exit 1
+          fi
+      - name: Verify official pages exist
+        run: |
+          test -s venliora-site/index.html
+          test -s venliora-site/web/index.html
+          test -s venliora-site/web/ejemplos/index.html
+          test -s venliora-site/privacy.html
+          test -s venliora-site/404.html
+          test -s venliora-site/sitemap.xml
+      - name: Deploy verified files to existing site only
+        run: npx --yes netlify-cli@latest deploy --prod --dir=venliora-site --site "$NETLIFY_SITE_ID" --message "VENLIORA official site at $GITHUB_SHA"
+      - name: Verify VENLIORA Web route and branding
+        run: |
+          for i in 1 2 3 4 5; do
+            if curl -fsSL --connect-timeout 10 --max-time 30 --retry 2 https://venliora.com/web/ | grep -q 'SITIO OFICIAL DE VENLIORA SPA'; then
+              echo "VENLIORA Web confirmed live"
+              exit 0
+            fi
+            sleep 8
+          done
+          echo "::error::Deployment returned but live official web route could not be verified"
+          exit 1
