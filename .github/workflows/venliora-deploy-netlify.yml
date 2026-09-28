@@ -1,11 +1,7 @@
 name: Publish VENLIORA to its existing Netlify site
+# Manual-only until the repository has its OWN verified Netlify Actions secret.
+# Current production releases are handled through VENLIORA's authorized Make connection.
 on:
-  push:
-    branches: [venliora-deploy]
-    paths:
-      - 'venliora-site/**'
-      - 'netlify.toml'
-      - '.github/workflows/venliora-deploy-netlify.yml'
   workflow_dispatch:
 permissions:
   contents: read
